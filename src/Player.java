@@ -5,13 +5,15 @@ import java.util.ArrayList;
  */
 public class Player {
 
-    /** Nome do utilizador */
+    /** Número de identificação de um jogador. */
+    private Integer ID;
+    /** Nome do utilizador. */
     private String name;
-    /** Passe de acesso do utilizador*/
+    /** Passe de acesso do utilizador. */
     private String password;
-    /** Os rankings, valores entre 0 e 9, de todos os jogos feitos pelo jogador até ao momento*/
+    /** Os rankings, valores entre 0 e 9, de todos os jogos feitos pelo jogador até ao momento. */
     private ArrayList<Integer> previousRankings;
-    /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos*/
+    /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos. */
     private Double ranking;
 
     /** Método de contrução do objeto Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
@@ -19,7 +21,9 @@ public class Player {
      * @param name Nome do utilizador.
      * @param password Passe de acesso.
      */
-    public Player(String name, String password) {
+
+    public Player(Integer ID, String name, String password) {
+        this.ID = ID;
         this.name = name;
         this.password = password;
         previousRankings = new ArrayList<>();
@@ -27,7 +31,7 @@ public class Player {
     }
 
     public static void main(String [] args){
-        Player p = new Player("João", "passe");
+        Player p = new Player(1,"João", "passe");
 
         System.out.println(p);
 
@@ -39,6 +43,22 @@ public class Player {
         p.addGame(1);
 
         System.out.println(p);
+    }
+
+    /** Getter do ID do jogador.
+     *
+     * @return ID.
+     */
+    public Integer getID() {
+        return ID;
+    }
+
+    /** Getter do ranking médio do jogador
+     *
+     * @return Ranking
+     */
+    public Double getRanking() {
+        return ranking;
     }
 
     /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
@@ -64,7 +84,8 @@ public class Player {
     @Override
     public String toString() {
         return "Player{" +
-                "name='" + name + '\'' +
+                "ID=" + ID +
+                ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
                 ", previousRankings=" + previousRankings +
                 ", ranking=" + ranking +
