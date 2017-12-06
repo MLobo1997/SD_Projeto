@@ -53,7 +53,7 @@ public class Barrier {
         }
         if (playersEntering[lobbyIndex] % size == 1) {
             // só um jogador novo, re-iniciar lista de espera
-            playersWaiting.add(lobbyIndex,new TreeSet<>());
+            selectedLobby = new TreeSet<>();
             selectedLobby.add(player);
         }
 
