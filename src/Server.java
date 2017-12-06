@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,14 +17,34 @@ public class Server {
     private /*final*/ MatchingPlayers matchingPlayers;
 
     public Server() throws IOException{
-        this.allPlayers = new PlayersRegister();
+        this.allPlayers = loadPlayers();
         this.onlinePlayers = new OnlinePlayers();
         this.matchingPlayers = new MatchingPlayers();
-       //lobby aqui
+        //lobby aqui
         this.server = new ServerSocket(9999);
     }
 
     public static void main(String [] args){
+        try {
+            Server s = new Server();
+            s.runServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public PlayersRegister loadPlayers() {
+        if (new File("players.sav").exists()) {
+            try {
+                FileInputStream saveFile = new FileInputStream("players.sav");
+                ObjectInputStream save = new ObjectInputStream(saveFile);
+                return ((PlayersRegister) save.readObject());
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return new PlayersRegister();
     }
 
     public void runServer (){
@@ -33,12 +53,13 @@ public class Server {
         while (true) {
             //CONNECT user
             try {
-                socket = this.server.accept();
+                socket = server.accept();
+                /* Iniciar novo prestador de serviços para cliente */
+                new ServerThread(socket,allPlayers).start();
             }
             catch (IOException e) {
-               e.printStackTrace();
+                e.printStackTrace();
             }
-            //
         }
     }
 }

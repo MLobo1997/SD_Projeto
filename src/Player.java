@@ -1,9 +1,10 @@
+import java.io.Serializable;
 import java.net.Socket;
 
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player{
+public class Player implements Serializable {
     /** Número de identificação de um jogador. */
     private Integer ID;
     /** Nome do utilizador. */
@@ -33,6 +34,10 @@ public class Player{
 
     public static void main(String [] args){
     }
+
+    public String getUsername() { return name; }
+
+    public String getPassword() { return password; }
 
     /** Getter do ID do jogador.
      *
