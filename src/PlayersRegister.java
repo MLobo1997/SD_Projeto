@@ -22,6 +22,25 @@ public class PlayersRegister implements Serializable {
         savePlayersInfo();
     }
 
+    /**
+     * Saber qual o jogador associado a dadas credenciais
+     * @param username Nome do jogador
+     * @param password Password do jogador
+     * @return Apontador para o jogador, null se não encontrado
+     */
+    public Player getPlayer(String username,String password) {
+        Player currPlayer; // procura atual
+        for (Map.Entry<Integer,Player> entry : players.entrySet()) {
+            currPlayer =  entry.getValue();
+            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
+               return currPlayer;
+            }
+        }
+        // Procura falhou, nada encontrado
+        return null;
+
+    }
+
     /** Número de jogadores registados */
     public int size() {
         return players.size();
@@ -29,7 +48,7 @@ public class PlayersRegister implements Serializable {
 
     /** Guardar informação de todos os utilizadores */
     public void savePlayersInfo() {
-        try {
+        try  {
             FileOutputStream saveFile = new FileOutputStream("players.sav");
             try (ObjectOutputStream save = new ObjectOutputStream(saveFile)) {
                 save.writeObject(this);
@@ -41,9 +60,10 @@ public class PlayersRegister implements Serializable {
 
     /** Credenciais candidatas existem no sistema? */
     public boolean playerExists(String username,String password) {
-
+        Player currPlayer; // procura atual
         for (Map.Entry<Integer,Player> entry : players.entrySet()) {
-            if (entry.getValue().getUsername().equals(username) && entry.getValue().getPassword().equals(password)) {
+            currPlayer = entry.getValue();
+            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
                 return true;
             }
         }

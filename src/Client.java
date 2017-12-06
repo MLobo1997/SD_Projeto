@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
+    // Connection info
     private Socket socket          = null;
     private BufferedReader scanner = null;
     private BufferedReader is      = null;

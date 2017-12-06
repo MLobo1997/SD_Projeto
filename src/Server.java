@@ -15,13 +15,15 @@ public class Server {
     private /*final*/ OnlinePlayers onlinePlayers;
     /** Jogadores que estão atualmente à procura de um jogo*/
     private /*final*/ MatchingPlayers matchingPlayers;
+    /** Barreira dinâmica que aloca jogadores e faz correspondentes threads esperar até match ser encontrado */
+    private Barrier matchmaker;
 
     public Server() throws IOException{
-        this.allPlayers = loadPlayers();
-        this.onlinePlayers = new OnlinePlayers();
-        this.matchingPlayers = new MatchingPlayers();
-        //lobby aqui
-        this.server = new ServerSocket(9999);
+        allPlayers      = loadPlayers();
+        onlinePlayers   = new OnlinePlayers();
+        matchingPlayers = new MatchingPlayers();
+        matchmaker      = new Barrier();
+        server          = new ServerSocket(9999);
     }
 
     public static void main(String [] args){
@@ -55,7 +57,7 @@ public class Server {
             try {
                 socket = server.accept();
                 /* Iniciar novo prestador de serviços para cliente */
-                new ServerThread(socket,allPlayers).start();
+                new ServerThread(socket,allPlayers,matchmaker).start();
             }
             catch (IOException e) {
                 e.printStackTrace();

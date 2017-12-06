@@ -1,10 +1,12 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.net.Socket;
 
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player implements Serializable {
+public class Player implements Serializable, Comparable {
     /** Número de identificação de um jogador. */
     private Integer ID;
     /** Nome do utilizador. */
@@ -84,5 +86,10 @@ public class Player implements Serializable {
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return ranking.compareTo(((Player) o).getRanking());
     }
 }
