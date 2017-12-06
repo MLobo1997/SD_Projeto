@@ -22,6 +22,9 @@ public class Client {
         }
     }
 
+    /**
+     * Ler informação do cliente necessária para inicializar jogo
+     */
     public void findMatch() {
         try {
             String lineInput = scanner.readLine();

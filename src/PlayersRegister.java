@@ -41,12 +41,17 @@ public class PlayersRegister implements Serializable {
 
     }
 
-    /** Número de jogadores registados */
+    /**
+     * Numero de jogadores registados
+     * @return Número de entradas na hashtable
+     */
     public int size() {
         return players.size();
     }
 
-    /** Guardar informação de todos os utilizadores */
+    /**
+     * Guarda informação de todos os jogadores
+     */
     public void savePlayersInfo() {
         try  {
             FileOutputStream saveFile = new FileOutputStream("players.sav");
@@ -58,7 +63,12 @@ public class PlayersRegister implements Serializable {
         }
     }
 
-    /** Credenciais candidatas existem no sistema? */
+    /**
+     * Credenciais existem no sistema?
+     * @param username Nome que utilizador inseriu
+     * @param password Password que o utilizador inseriu
+     * @return Resposta: tuplo existe ou não na base de dados?
+     */
     public boolean playerExists(String username,String password) {
         Player currPlayer; // procura atual
         for (Map.Entry<Integer,Player> entry : players.entrySet()) {

@@ -28,11 +28,17 @@ public class ServerThread extends Thread {
         }
     }
 
+    /**
+     * Retornar jogador associado da thread
+     * @return informação do jogador cujo cliente a ServerThread está a servir
+     */
     public Player getPlayer() {
        return player;
     }
 
-    /** Fechar todos os canais de comunicação */
+    /**
+     * Fechar todos os canais de comunicação
+     */
     public void cleanup () {
         try {
             in.close();
@@ -43,7 +49,9 @@ public class ServerThread extends Thread {
         }
     }
 
-    /** Recebe input do utilizador e regista na base de dados */
+    /**
+     * Recebe input do utilizador e regista na base de dados
+     */
     public void registerPlayer() {
         try {
             // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(0 ou 1)
@@ -67,7 +75,9 @@ public class ServerThread extends Thread {
         }
     }
 
-    /** Recebe input do utilizador e verifica se está na base de dados */
+    /**
+     * Recebe input do utilizador e verifica se está na base de dados
+     */
     public void loginPlayer() {
         // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido
             String username  = null;
@@ -91,7 +101,9 @@ public class ServerThread extends Thread {
         player = allPlayers.getPlayer(username,password);
     }
 
-    /** Função de teste de feedback */
+    /**
+     * Função de teste de feedback
+     */
     public void echoLoop() {
         String str;
 
@@ -134,6 +146,8 @@ public class ServerThread extends Thread {
 
             // look for match
             matchmaker.waitGame(this);
+
+            // TODO: Jogo começa aqui
 
             // test
             out.println("Did it work boy?");

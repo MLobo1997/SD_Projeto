@@ -2,8 +2,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/** A classe principal do servidor.
- *
+/**
+ * A classe principal do servidor.
  */
 public class Server {
     /** Registo de todas as contas. */
@@ -27,6 +27,7 @@ public class Server {
     }
 
     public static void main(String [] args){
+        // TODO: Iniciar implementação gráfica
         try {
             Server s = new Server();
             s.runServer();
@@ -35,6 +36,11 @@ public class Server {
         }
     }
 
+    /**
+     * Carrega da base de dados a lista de utilizadores que se encontra na diretoria de trabalho
+     *
+     * @return O registo de jogadores guardados se existir, senão retorna um completamente novo
+     */
     public PlayersRegister loadPlayers() {
         if (new File("players.sav").exists()) {
             try {
@@ -49,11 +55,14 @@ public class Server {
         return new PlayersRegister();
     }
 
+    /**
+     * Loop continuo que aceita clientes que se ligam ao servidor e aloca-os os devidos recursos
+     */
     public void runServer (){
         Socket socket;
 
         while (true) {
-            //CONNECT user
+            // conectar utilizador
             try {
                 socket = server.accept();
                 /* Iniciar novo prestador de serviços para cliente */
