@@ -17,8 +17,8 @@ public class Barrier {
         // Inicializar lista de TreeSets:
         // indice 0: Pessoas de rank 0
         // indice 1: Pessoas de rank 0 até 1
-
         playersWaiting  = new ArrayList<>();
+
         // inicializar todos os TreeSets da lista
         for (int i = 0; i < size; i++) {
             playersWaiting.add(i,new TreeSet<>());
@@ -30,6 +30,7 @@ public class Barrier {
       * @param st thread que presta serviços ao cliente
      */
     synchronized void waitGame(ServerThread st) {
+        System.out.println("Entrou " +  st.getPlayer().getUsername());
         // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
         Player player = st.getPlayer();
 
@@ -42,23 +43,21 @@ public class Barrier {
         // Lida com caso de exceção em que se fores de rank 0 serias associado ao indice -1
         playersEntering[lobbyIndex]++;
 
-        TreeSet<Player> selectedLobby = rankCap != 0
-                ? playersWaiting.get(lobbyIndex)
-                : playersWaiting.get(0);
-
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] % size == 0) {
-            selectedLobby.add(player);
+            playersWaiting.get(lobbyIndex).add(player);
             notifyAll();
         }
+
         if (playersEntering[lobbyIndex] % size == 1) {
             // só um jogador novo, re-iniciar lista de espera
-            selectedLobby = new TreeSet<>();
-            selectedLobby.add(player);
+            playersWaiting.get(lobbyIndex).clear();
+            playersWaiting.get(lobbyIndex).add(player);
         }
 
-        try {
+        System.out.println(playersWaiting);
 
+        try {
             while (playersEntering[lobbyIndex] % size != 0) {
                 wait();
             }

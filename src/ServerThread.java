@@ -78,6 +78,7 @@ public class ServerThread extends Thread {
     /**
      * Recebe input do utilizador e verifica se está na base de dados
      */
+    // TODO: Nao aceitar um jogador logged in se já estiver (adicionar booleano algures)
     public void loginPlayer() {
         // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido
             String username  = null;

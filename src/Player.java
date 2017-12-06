@@ -57,6 +57,10 @@ public class Player implements Serializable, Comparable {
         return ranking;
     }
 
+    public void setRank(double rank) {
+        this.ranking = rank;
+    }
+
     /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
      *
      * @param rank Rank do jogo.
@@ -90,6 +94,11 @@ public class Player implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return ranking.compareTo(((Player) o).getRanking());
+        int difference = (int) (ranking - ((Player) o).getRanking());
+        if (difference == 0) {
+            return 1; // Para permitir chaves iguais
+        } else {
+            return difference;
+        }
     }
 }
