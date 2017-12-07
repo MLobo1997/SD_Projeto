@@ -44,7 +44,9 @@ public class ServerThread extends Thread {
             in.close();
             out.close();
             socket.close();
-            player.goOffline();
+            if (player != null) {
+                player.goOffline();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

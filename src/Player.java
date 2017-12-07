@@ -82,6 +82,9 @@ public class Player implements Serializable, Comparable {
         online = false;
     }
 
+    /**
+     * Sinalizar jogador como online
+     */
     public boolean isOnline() {
         return online;
     }
