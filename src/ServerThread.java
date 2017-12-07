@@ -33,7 +33,7 @@ public class ServerThread extends Thread {
      * @return informação do jogador cujo cliente a ServerThread está a servir
      */
     public Player getPlayer() {
-       return player;
+        return player;
     }
 
     /**
@@ -44,6 +44,7 @@ public class ServerThread extends Thread {
             in.close();
             out.close();
             socket.close();
+            player.goOffline();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,35 +72,40 @@ public class ServerThread extends Thread {
 
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Client left");
         }
     }
 
     /**
      * Recebe input do utilizador e verifica se está na base de dados
      */
-    // TODO: Nao aceitar um jogador logged in se já estiver (adicionar booleano algures)
     public void loginPlayer() {
         // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido
-            String username  = null;
-            String password  = null;
-            boolean isLogged = false;
+        String username  = null;
+        String password  = null;
+        boolean isLogged = false;
 
         try {
             while (!isLogged) {
                 username = in.readLine();
                 password = in.readLine();
-                if (allPlayers.playerExists(username,password)) {
+                Player foundPlayer = allPlayers.getPlayer(username,password);
+                // Garantir que jogador existe e, caso exista, que não tem outro cliente a usa-lo atualmente
+                if ( (foundPlayer != null) && (!foundPlayer.isOnline()) ) {
                     isLogged = true;
+                } else {
+                    out.println("Login failed (account doesn't exist or already being used)");
                 }
-                out.println("Login worked? " + isLogged);
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
 
+
+
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
         player = allPlayers.getPlayer(username,password);
+        player.goOnline();
     }
 
     /**
@@ -112,11 +118,8 @@ public class ServerThread extends Thread {
             while(!(str = in.readLine()).equals("quit")) {
                 out.println(str);
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.out.println("Client left, shutting down its thread..");
-            cleanup();
         }
     }
 
@@ -154,8 +157,9 @@ public class ServerThread extends Thread {
             out.println("Did it work boy?");
 
             cleanup();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | NullPointerException e) {
+            System.out.println("Client left");
+            cleanup();
         }
     }
 }

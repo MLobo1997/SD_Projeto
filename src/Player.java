@@ -1,7 +1,6 @@
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.net.Socket;
 
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
@@ -17,8 +16,8 @@ public class Player implements Serializable, Comparable {
     private Integer nrOfGames;
     /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos. */
     private Double ranking;
-    /** Socket de comunicação com o servidor, null no caso de não estar conectado*/
-    private Socket socket;
+    /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
+    private boolean online;
 
     /** Método de contrução do objeto Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
      *
@@ -29,9 +28,9 @@ public class Player implements Serializable, Comparable {
         this.ID = ID;
         this.name = name;
         this.password = password;
+        online    = false;
         nrOfGames = 0;
-        ranking = 0.0;
-        socket = null;
+        ranking   = 0.0;
     }
 
     public static void main(String [] args){
@@ -67,6 +66,24 @@ public class Player implements Serializable, Comparable {
 
     public void setRank(double rank) {
         this.ranking = rank;
+    }
+
+    /**
+     * Sinalizar jogador como online
+     */
+    public void goOnline() {
+        online = true;
+    }
+
+    /**
+     * Sinalizar jogador como offline
+     */
+    public void goOffline() {
+        online = false;
+    }
+
+    public boolean isOnline() {
+        return online;
     }
 
     /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
