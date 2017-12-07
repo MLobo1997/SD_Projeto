@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -18,6 +21,10 @@ public class Server {
     /** Barreira dinâmica que aloca jogadores e faz correspondentes threads esperar até match ser encontrado */
     private Barrier matchmaker;
 
+    /** Construtor do servidor.
+     *
+     * @throws IOException No método de contrução dum ServerSocket.
+     */
     public Server() throws IOException{
         allPlayers      = loadPlayers();
         onlinePlayers   = new OnlinePlayers();

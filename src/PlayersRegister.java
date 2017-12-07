@@ -17,7 +17,7 @@ public class PlayersRegister implements Serializable {
     }
 
     /** Adicionar jogador à base de dados */
-    public void addPlayer(Player p) {
+    public synchronized void addPlayer(Player p) {
         players.put(p.getID(),p);
         savePlayersInfo();
     }
@@ -28,7 +28,7 @@ public class PlayersRegister implements Serializable {
      * @param password Password do jogador
      * @return Apontador para o jogador, null se não encontrado
      */
-    public Player getPlayer(String username,String password) {
+    public synchronized Player getPlayer(String username,String password) {
         Player currPlayer; // procura atual
         for (Map.Entry<Integer,Player> entry : players.entrySet()) {
             currPlayer =  entry.getValue();

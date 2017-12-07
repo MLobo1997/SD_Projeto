@@ -1,15 +1,27 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+/** TODO: dar uma explicação desta classe
+ *
+ */
 public class Barrier {
-    List<TreeSet<Player>> playersWaiting;
-    int[] playersEntering;
-    int size;
-    HashSet<ServerThread> players;
+    /**Coleção de jogadores que estão atualmente à espera, registados numa estrutura tipo matricial, em
+     * que as linhas representam o intervalo de valores (entre inteiros) de ranking em que os jogadores se encontram.
+     * E.g.: Um jogador com uma média de ranking 4.33 estará contido na 4a entrada.
+     */
+    private List<TreeSet<Player>> playersWaiting;
+    /**Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
+    private int[] playersEntering;
+    /**Número de jogadores por jogada.*/
+    private int size;
+    /**Coleção de threads dedicadas a jogadores.*/
+    private HashSet<ServerThread> players;
 
+    /** Construtor de barreira.
+     *
+     */
     public Barrier() {
         size            = 2; // TODO: Valor temporário, mudar
         playersEntering = new int[size];
@@ -34,7 +46,7 @@ public class Barrier {
         // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
         Player player = st.getPlayer();
 
-        // Usado para determinar para qual dos lobbies jogador irá
+        // Usado para determinar para qual dos lobbies o jogador irá
         int rankCap = (int) Math.floor(player.getRanking());
 
         // Como jogador irá para o indice rankJogador - 1, lidar com o caso de excessão rank = 0;
