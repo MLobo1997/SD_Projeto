@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
+    // Connection info
     private Socket socket          = null;
     private BufferedReader scanner = null;
     private BufferedReader is      = null;
@@ -21,6 +22,9 @@ public class Client {
         }
     }
 
+    /**
+     * Ler informação do cliente necessária para inicializar jogo
+     */
     public void findMatch() {
         try {
             String lineInput = scanner.readLine();

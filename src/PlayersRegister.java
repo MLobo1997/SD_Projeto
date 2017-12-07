@@ -22,14 +22,38 @@ public class PlayersRegister implements Serializable {
         savePlayersInfo();
     }
 
-    /** Número de jogadores registados */
+    /**
+     * Saber qual o jogador associado a dadas credenciais
+     * @param username Nome do jogador
+     * @param password Password do jogador
+     * @return Apontador para o jogador, null se não encontrado
+     */
+    public Player getPlayer(String username,String password) {
+        Player currPlayer; // procura atual
+        for (Map.Entry<Integer,Player> entry : players.entrySet()) {
+            currPlayer =  entry.getValue();
+            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
+               return currPlayer;
+            }
+        }
+        // Procura falhou, nada encontrado
+        return null;
+
+    }
+
+    /**
+     * Numero de jogadores registados
+     * @return Número de entradas na hashtable
+     */
     public int size() {
         return players.size();
     }
 
-    /** Guardar informação de todos os utilizadores */
+    /**
+     * Guarda informação de todos os jogadores
+     */
     public void savePlayersInfo() {
-        try {
+        try  {
             FileOutputStream saveFile = new FileOutputStream("players.sav");
             try (ObjectOutputStream save = new ObjectOutputStream(saveFile)) {
                 save.writeObject(this);
@@ -39,11 +63,17 @@ public class PlayersRegister implements Serializable {
         }
     }
 
-    /** Credenciais candidatas existem no sistema? */
+    /**
+     * Credenciais existem no sistema?
+     * @param username Nome que utilizador inseriu
+     * @param password Password que o utilizador inseriu
+     * @return Resposta: tuplo existe ou não na base de dados?
+     */
     public boolean playerExists(String username,String password) {
-
+        Player currPlayer; // procura atual
         for (Map.Entry<Integer,Player> entry : players.entrySet()) {
-            if (entry.getValue().getUsername().equals(username) && entry.getValue().getPassword().equals(password)) {
+            currPlayer = entry.getValue();
+            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
                 return true;
             }
         }
