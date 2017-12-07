@@ -39,6 +39,7 @@ public class MatchingPlayers {
         System.out.println(players);
     }
 
+
     /** Adiciona um jogador de forma ordenada por média de ranking.
      *
      * @param p Jogador a ser adicionado.

@@ -35,8 +35,16 @@ public class Player implements Serializable {
     public static void main(String [] args){
     }
 
+    /** Getter do username do jogador.
+     *
+     * @return username.
+     */
     public String getUsername() { return name; }
 
+    /** Getter da pass do jogador.
+     *
+     * @return pass.
+     */
     public String getPassword() { return password; }
 
     /** Getter do ID do jogador.
