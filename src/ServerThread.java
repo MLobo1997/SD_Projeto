@@ -7,7 +7,7 @@ import java.net.Socket;
 /**Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  *
  */
-public class ServerThread extends Thread {
+public class ServerThread extends Thread implements Comparable {
     // Connection info
     /** Buffer de leitura de comunições do cliente*/
     private BufferedReader in;
@@ -48,20 +48,27 @@ public class ServerThread extends Thread {
      * @return informação do jogador cujo cliente a ServerThread está a servir
      */
     public Player getPlayer() {
-       return player;
+        return player;
     }
 
     /**
      * Fechar todos os canais de comunicação
      */
-    public void cleanup () {
+    public void cleanup() {
         try {
             in.close();
             out.close();
             socket.close();
+            if (player != null) {
+                player.goOffline();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void printToOutput(String line) {
+        out.println(line);
     }
 
     /**
@@ -89,19 +96,18 @@ public class ServerThread extends Thread {
 
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Client left");
         }
     }
 
     /**
      * Recebe input do utilizador e verifica se está na base de dados
      */
-    // TODO: Nao aceitar um jogador logged in se já estiver (adicionar booleano algures)
     public void loginPlayer() {
         // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido
-            String username  = null;
-            String password  = null;
-            boolean isLogged = false;
+        String username  = null;
+        String password  = null;
+        boolean isLogged = false;
 
         try {
             while (!isLogged) {
@@ -109,17 +115,21 @@ public class ServerThread extends Thread {
                 username = in.readLine();
                 out.println("Password:");
                 password = in.readLine();
-                if (allPlayers.playerExists(username,password)) { //TODO:não permitir logins atualmente online
+                Player foundPlayer = allPlayers.getPlayer(username,password);
+                // Garantir que jogador existe e, caso exista, que não tem outro cliente a usa-lo atualmente
+                if ( (foundPlayer != null) && (!foundPlayer.isOnline()) ) {
                     isLogged = true;
+                } else {
+                    out.println("Login failed (account doesn't exist or already being used)");
                 }
-                out.println("Login worked? " + isLogged);
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
 
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
         player = allPlayers.getPlayer(username,password);
+        player.goOnline();
     }
 
     /**
@@ -132,11 +142,23 @@ public class ServerThread extends Thread {
             while(!(str = in.readLine()).equals("quit")) {
                 out.println(str);
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.out.println("Client left, shutting down its thread..");
-            cleanup();
+        }
+    }
+
+    public void commandMode() {
+        String str = null;
+
+        while (true) {
+            try {
+                str = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (str.equals("play")) {
+                break;
+            }
         }
     }
 
@@ -176,14 +198,20 @@ public class ServerThread extends Thread {
             // look for match
             matchmaker.waitGame(this);
 
-            // TODO: Jogo começa aqui
-
-            // test
-            out.println("Did it work boy?");
-
             cleanup();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | NullPointerException e) {
+            System.out.println("Client left");
+            cleanup();
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int difference = (int) (player.getRanking() - ((ServerThread) o).player.getRanking());
+        if (difference == 0) {
+            return 1; // Para permitir chaves iguais
+        } else {
+            return difference;
         }
     }
 }

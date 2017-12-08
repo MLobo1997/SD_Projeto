@@ -1,10 +1,11 @@
 import java.io.Serializable;
-import java.net.Socket;
 
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
 public class Player implements Serializable, Comparable {
+    /** Número de identificação de um jogador. */
+    private Integer ID;
     /** Nome do utilizador. */
     private String name;
     /** Passe de acesso do utilizador. */
@@ -13,8 +14,8 @@ public class Player implements Serializable, Comparable {
     private Integer nrOfGames;
     /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos. */
     private Double ranking;
-    /** Socket de comunicação com o servidor, null no caso de não estar conectado*/
-    private Socket socket;
+    /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
+    private boolean online;
 
     /** Método de contrução do objeto Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
      *
@@ -22,11 +23,11 @@ public class Player implements Serializable, Comparable {
      * @param password Passe de acesso.
      */
     public Player(Integer ID, String name, String password) {
-        this.name = name;
+        this.name     = name;
         this.password = password;
-        nrOfGames = 0;
-        ranking = 0.0;
-        socket = null;
+        online        = false;
+        nrOfGames     = 0;
+        ranking       = 0.0;
     }
 
     public static void main(String [] args){
@@ -54,6 +55,27 @@ public class Player implements Serializable, Comparable {
 
     public void setRank(double rank) {
         this.ranking = rank;
+    }
+
+    /**
+     * Sinalizar jogador como online
+     */
+    public void goOnline() {
+        online = true;
+    }
+
+    /**
+     * Sinalizar jogador como offline
+     */
+    public void goOffline() {
+        online = false;
+    }
+
+    /**
+     * Sinalizar jogador como online
+     */
+    public boolean isOnline() {
+        return online;
     }
 
     /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
@@ -84,15 +106,5 @@ public class Player implements Serializable, Comparable {
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        int difference = (int) (ranking - ((Player) o).getRanking());
-        if (difference == 0) {
-            return 1; // Para permitir chaves iguais
-        } else {
-            return difference;
-        }
     }
 }
