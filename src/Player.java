@@ -3,7 +3,7 @@ import java.io.Serializable;
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player implements Serializable, Comparable {
+public class Player implements Serializable {
     /** Número de identificação de um jogador. */
     private Integer ID;
     /** Nome do utilizador. */
@@ -43,7 +43,7 @@ public class Player implements Serializable, Comparable {
      *
      * @return pass.
      */
-    public String getPassword() { return password; }
+    private String getPassword() { return password; }
 
     /** Getter do ranking médio do jogador
      *
@@ -92,6 +92,15 @@ public class Player implements Serializable, Comparable {
             throw new IllegalArgumentException("A função addGame foi evocada com um valor inferior a 0 ou superior a 9");
         }
 
+    }
+
+    /**Verifica se as passes entre as duas instâncias de jogador correspondem.
+     *
+     * @param other Outro jogador.
+     * @return True se correspondem.
+     */
+    public boolean passwordEquals(Player other){
+        return (this.password.equals(other.password));
     }
 
     /** Método de debug.

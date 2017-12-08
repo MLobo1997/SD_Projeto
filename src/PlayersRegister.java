@@ -1,3 +1,5 @@
+import com.sun.javaws.exceptions.InvalidArgumentException;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -32,7 +34,7 @@ public class PlayersRegister implements Serializable {
         Player currPlayer; // procura atual
         for (Map.Entry<String,Player> entry : players.entrySet()) {
             currPlayer =  entry.getValue();
-            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
+            if (currPlayer.getUsername().equals(username)) {
                return currPlayer;
             }
         }
@@ -73,11 +75,27 @@ public class PlayersRegister implements Serializable {
         Player currPlayer; // procura atual
         for (Map.Entry<String,Player> entry : players.entrySet()) {
             currPlayer = entry.getValue();
-            if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
+            if ( (currPlayer.getUsername().equals(username))) {
                 return true;
             }
         }
         // Falhou encontrar um utilizador com esses valores
         return false;
+    }
+
+    /** Verifica se uma instância de Player tem a password correta.
+     *
+     * @param tmp Player a ser verificado.
+     * @return Booleano de verificação.
+     */
+    public boolean correctPassword(Player tmp){
+        Player p = players.get(tmp.getUsername());
+
+        if (p != null) {
+            return p.passwordEquals(tmp);
+        }
+        else {
+           throw new IllegalArgumentException("O jogador não existe no sistema!!");
+        }
     }
 }
