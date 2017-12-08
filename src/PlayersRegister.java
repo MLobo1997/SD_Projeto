@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class PlayersRegister implements Serializable {
     /** Todas as contas*/
-    private HashMap<Integer, Player> players;
+    private HashMap<String, Player> players;
 
     /** Construtor da classe a utilizar na primeira inicialização do servidor*/
     public PlayersRegister(){
@@ -18,7 +18,7 @@ public class PlayersRegister implements Serializable {
 
     /** Adicionar jogador à base de dados */
     public synchronized void addPlayer(Player p) {
-        players.put(p.getID(),p);
+        players.put(p.getUsername(),p);
         savePlayersInfo();
     }
 
@@ -30,7 +30,7 @@ public class PlayersRegister implements Serializable {
      */
     public synchronized Player getPlayer(String username,String password) {
         Player currPlayer; // procura atual
-        for (Map.Entry<Integer,Player> entry : players.entrySet()) {
+        for (Map.Entry<String,Player> entry : players.entrySet()) {
             currPlayer =  entry.getValue();
             if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
                return currPlayer;
@@ -71,7 +71,7 @@ public class PlayersRegister implements Serializable {
      */
     public boolean playerExists(String username,String password) {
         Player currPlayer; // procura atual
-        for (Map.Entry<Integer,Player> entry : players.entrySet()) {
+        for (Map.Entry<String,Player> entry : players.entrySet()) {
             currPlayer = entry.getValue();
             if ( (currPlayer.getUsername().equals(username)) && (currPlayer.getPassword().equals(password)) ) {
                 return true;

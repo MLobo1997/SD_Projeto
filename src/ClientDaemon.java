@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.Socket;
 
+/** Classe utilizada para a thread de Cliente que funciona como um listener dos dados que lhe são enviados
+ *
+ */
 public class ClientDaemon extends Thread {
     private BufferedReader is = null;
     private Socket socket = null;

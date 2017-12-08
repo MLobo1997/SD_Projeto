@@ -49,7 +49,7 @@ public class MatchingPlayers {
         int i;
 
         for(i = 0 ; i < players.size() ; i++) {
-            if(p.getID() != players.get(i).getID()) {
+            if(p.getUsername() != players.get(i).getUsername()) {
                 if(p.getRanking() < players.get(i).getRanking()){
                     break;
                 }
