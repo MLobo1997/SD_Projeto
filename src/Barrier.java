@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class Barrier {
-    List<TreeSet<Player>> playersWaiting;
+    List<TreeSet<ServerThread>> playersWaiting;
     int[] playersEntering;
     int size;
     HashSet<ServerThread> players;
@@ -25,9 +25,17 @@ public class Barrier {
         }
     }
 
+    public void showPlayersInLobby(int lobbyIndex) {
+        System.out.print("[");
+        for (ServerThread s : playersWaiting.get(lobbyIndex)) {
+            System.out.print(s.getPlayer().getUsername() + ",");
+        }
+        System.out.println("]");
+    }
+
     /**
      * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar
-      * @param st thread que presta serviços ao cliente
+     * @param st thread que presta serviços ao cliente
      */
     synchronized void waitGame(ServerThread st) {
         System.out.println("Entrou " +  st.getPlayer().getUsername());
@@ -45,17 +53,25 @@ public class Barrier {
 
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] % size == 0) {
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
             notifyAll();
+
+            Match m = new Match(playersWaiting.get(lobbyIndex));
+            m.run();
+            try {
+                m.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (playersEntering[lobbyIndex] % size == 1) {
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
         }
 
-        System.out.println(playersWaiting);
+        showPlayersInLobby(lobbyIndex);
 
         try {
             while (playersEntering[lobbyIndex] % size != 0) {

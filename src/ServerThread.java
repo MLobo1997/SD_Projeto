@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ServerThread extends Thread {
+public class ServerThread extends Thread implements Comparable {
     // Connection info
     private BufferedReader in;
     private PrintWriter out;
@@ -39,7 +39,7 @@ public class ServerThread extends Thread {
     /**
      * Fechar todos os canais de comunicação
      */
-    public void cleanup () {
+    public void cleanup() {
         try {
             in.close();
             out.close();
@@ -50,6 +50,10 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void printToOutput(String line) {
+        out.println(line);
     }
 
     /**
@@ -103,8 +107,6 @@ public class ServerThread extends Thread {
             e.printStackTrace();
         }
 
-
-
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
         player = allPlayers.getPlayer(username,password);
         player.goOnline();
@@ -122,6 +124,21 @@ public class ServerThread extends Thread {
             }
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void commandMode() {
+        String str = null;
+
+        while (true) {
+            try {
+                str = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (str.equals("play")) {
+                break;
+            }
         }
     }
 
@@ -150,18 +167,26 @@ public class ServerThread extends Thread {
                 }
             }
 
+            // Wait for player to signal they want to play
+            commandMode();
+
             // look for match
             matchmaker.waitGame(this);
-
-            // TODO: Jogo começa aqui
-
-            // test
-            out.println("Did it work boy?");
 
             cleanup();
         } catch (IOException | NullPointerException e) {
             System.out.println("Client left");
             cleanup();
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int difference = (int) (player.getRanking() - ((ServerThread) o).player.getRanking());
+        if (difference == 0) {
+            return 1; // Para permitir chaves iguais
+        } else {
+            return difference;
         }
     }
 }

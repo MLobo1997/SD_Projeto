@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player implements Serializable, Comparable {
+public class Player implements Serializable {
     /** Número de identificação de um jogador. */
     private Integer ID;
     /** Nome do utilizador. */
@@ -25,12 +25,12 @@ public class Player implements Serializable, Comparable {
      * @param password Passe de acesso.
      */
     public Player(Integer ID, String name, String password) {
-        this.ID = ID;
-        this.name = name;
+        this.ID       = ID;
+        this.name     = name;
         this.password = password;
-        online    = false;
-        nrOfGames = 0;
-        ranking   = 0.0;
+        online        = false;
+        nrOfGames     = 0;
+        ranking       = 0.0;
     }
 
     public static void main(String [] args){
@@ -118,15 +118,5 @@ public class Player implements Serializable, Comparable {
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        int difference = (int) (ranking - ((Player) o).getRanking());
-        if (difference == 0) {
-            return 1; // Para permitir chaves iguais
-        } else {
-            return difference;
-        }
     }
 }
