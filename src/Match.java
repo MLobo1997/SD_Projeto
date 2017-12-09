@@ -12,7 +12,6 @@ public class Match extends Thread {
     }
 
     public void run() {
-        // TODO: Implement chat
         for (ServerThread st : players) {
             st.printToOutput("Welcome to the match!");
         }
