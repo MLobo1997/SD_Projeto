@@ -47,12 +47,10 @@ public class Client {
 
             if(tmp.equals("0")){
                 registerPlayer();
-                System.out.println("TA FETCHO");
-
-                //TODO:login
+                loginPlayer();
             }
             else if(tmp.equals("1")){
-                //TODO:login
+                loginPlayer();
             }
 
         } catch (IOException e) {
@@ -106,35 +104,45 @@ public class Client {
         System.out.println("Registado com sucesso!");
     }
 
-    public Player login(){
-        String username = null , password = null, tmp = null, response = null;
+    public Player loginPlayer(){
+        String username, password, tmp = null, response = null;
         Boolean check = false;
         Player p = null;
 
         try {
             while(!check){
                 System.out.println("---Login---");
-                do {
-                    //begin de processo de username
-                    if ("0".equals(response)) //tem que ser assim pq se o this for response dará nullPointerException
-                        System.out.println("O jogador não existe");
-                    else if ("-1".equals(response))
-                        System.out.println("O jogador já está online");
-                    System.out.println("Username:");
-                    username = scanner.readLine();
-                    os.println(username);
-                    response = is.readLine();
-                    //end de processo de username
-                } while(response.equals("0") || response.equals("-1"));
 
-                if (response.equals("1")){
+                System.out.println("Username:");
+                username = scanner.readLine();
+                os.println(username);
+
+                System.out.println("Password:");
+                password = scanner.readLine();
+                os.println(password);
+
+                response = is.readLine();
+                if(response.equals("0")){
+                    System.out.println("O utilizador não existe!!");
+                }
+                else if(response.equals("-1")){
+                    System.out.println("A password está errada!");
+                }
+                else if(response.equals("-2")){
+                    System.out.println("O utilizador já se encontra online!");
+                }
+                else if(response.equals("1")){
+                    System.out.println("Login sucedido!");
                     check = true;
                 }
+
+                p = new Player(username, password);
+                p.goOnline();
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return p;
     }
     /**

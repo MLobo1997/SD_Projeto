@@ -94,11 +94,11 @@ public class Player implements Serializable {
 
     /**Verifica se as passes entre as duas instâncias de jogador correspondem.
      *
-     * @param other Outro jogador.
+     * @param password Outro jogador.
      * @return True se correspondem.
      */
-    public boolean passwordEquals(Player other){
-        return (this.password.equals(other.password));
+    public boolean passwordEquals(String password){
+        return (this.password.equals(password));
     }
 
     /** Método de debug.

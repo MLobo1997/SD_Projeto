@@ -63,14 +63,15 @@ public class PlayersRegister implements Serializable {
 
     /** Verifica se uma instância de Player tem a password correta.
      *
-     * @param tmp Player a ser verificado.
+     * @param username Player a ser verificado.
+     * @param pass Password a ser verificada.
      * @return Booleano de verificação.
      */
-    public boolean correctPassword(Player tmp){
-        Player p = players.get(tmp.getUsername());
+    public boolean correctPassword(String username, String pass){
+        Player p = players.get(username);
 
         if (p != null) {
-            return p.passwordEquals(tmp);
+            return p.passwordEquals(pass);
         }
         else {
            throw new IllegalArgumentException("O jogador não existe no sistema!!");
