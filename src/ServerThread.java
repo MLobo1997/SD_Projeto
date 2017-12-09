@@ -97,26 +97,34 @@ public class ServerThread extends Thread implements Comparable {
      */
     public void registerPlayer() {
         try {
-            // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(0 ou 1)
+            // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(y ou n)
             String username = null;
             String password = null;
             boolean isRegistered = false;
+            boolean repeat = true;
 
-            while (!isRegistered) {
+
+            while (repeat) {  //0 no caso de ser a 1a vez ou o cliente ja existir, -1 se tiver sido cancelado o processo
                 do {
-                    if(username != null)
-                        out.println("0");
+
+                    if(isRegistered)
+                        out.println("0"); //diz que o jogador já existia
+
                     username = in.readLine();
-                    System.out.println(username);
-                } while (allPlayers.playerExists(username));
-                out.println("1");
+                    password = in.readLine();
 
-                password = in.readLine();
-                isRegistered = in.readLine().equals("1");
+                    isRegistered = allPlayers.playerExists(username);
+                } while (isRegistered);
+                out.println("1"); //diz que o jogador não existe
+
+                repeat = in.readLine().equals("0");
+
+                if(!repeat) {
+                    allPlayers.addPlayer(new Player(username, password));
+                    System.out.println("Utilizador registado");
+                    repeat = false;
+                }
             }
-
-            allPlayers.addPlayer(new Player(allPlayers.size() + 1,username,password));
-
 
         } catch (IOException e) {
             System.out.println("Client left");
@@ -131,12 +139,17 @@ public class ServerThread extends Thread implements Comparable {
         String username  = null;
         String password  = null;
         boolean isLogged = false;
+        Player p = null;
+        boolean check = false;
 
         try {
             while (!isLogged) {
-                out.println("Username:");
-                username = in.readLine();
-                out.println("Password:");
+                while (!check) {
+                    username = in.readLine();
+
+                    //if()
+                }
+
                 password = in.readLine();
                 Player foundPlayer = allPlayers.getPlayer(username);
                 // Garantir que jogador existe e, caso exista, que não tem outro cliente a usa-lo atualmente

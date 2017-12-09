@@ -8,21 +8,21 @@ public class MatchingPlayers {
     private final LinkedList<Player> players = new LinkedList<>();
 
     public static void main(String [] args){
-        Player p = new Player(1,"josue", "segredo");
+        Player p = new Player("josue", "segredo");
         p.addGame(4);
         p.addGame(2);
         p.addGame(9);
         p.addGame(9);
         p.addGame(1);
         p.addGame(1);
-        Player p1 = new Player(2,"mano", "sexo");
+        Player p1 = new Player("mano", "sexo");
         p1.addGame(2);
         p1.addGame(3);
         p1.addGame(1);
         p1.addGame(4);
         p1.addGame(0);
         p1.addGame(2);
-        Player p2 = new Player(3,"check", "mate");
+        Player p2 = new Player("check", "mate");
         p2.addGame(1);
         p2.addGame(2);
         p2.addGame(3);

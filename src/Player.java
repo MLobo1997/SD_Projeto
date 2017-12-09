@@ -4,8 +4,6 @@ import java.io.Serializable;
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
 public class Player implements Serializable {
-    /** Número de identificação de um jogador. */
-    private Integer ID;
     /** Nome do utilizador. */
     private String name;
     /** Passe de acesso do utilizador. */
@@ -22,7 +20,7 @@ public class Player implements Serializable {
      * @param name Nome do utilizador.
      * @param password Passe de acesso.
      */
-    public Player(Integer ID, String name, String password) {
+    public Player(String name, String password) {
         this.name     = name;
         this.password = password;
         online        = false;
