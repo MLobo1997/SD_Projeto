@@ -82,14 +82,16 @@ public class ServerThread extends Thread implements Comparable {
             boolean isRegistered = false;
 
             while (!isRegistered) {
-                out.println("Username:");
-                username = in.readLine();
-                out.println("Password:");
-                password = in.readLine();
-                out.println("Are you sure? [1]:");
-                isRegistered = in.readLine().equals("1");
+                do {
+                    if(username != null)
+                        out.println("0");
+                    username = in.readLine();
+                    System.out.println(username);
+                } while (allPlayers.playerExists(username));
+                out.println("1");
 
-                out.println("Register worked? " + isRegistered);
+                password = in.readLine();
+                isRegistered = in.readLine().equals("1");
             }
 
             allPlayers.addPlayer(new Player(allPlayers.size() + 1,username,password));
@@ -115,7 +117,7 @@ public class ServerThread extends Thread implements Comparable {
                 username = in.readLine();
                 out.println("Password:");
                 password = in.readLine();
-                Player foundPlayer = allPlayers.getPlayer(username,password);
+                Player foundPlayer = allPlayers.getPlayer(username);
                 // Garantir que jogador existe e, caso exista, que não tem outro cliente a usa-lo atualmente
                 if ( (foundPlayer != null) && (!foundPlayer.isOnline()) ) {
                     isLogged = true;
@@ -128,7 +130,7 @@ public class ServerThread extends Thread implements Comparable {
         }
 
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
-        player = allPlayers.getPlayer(username,password);
+        player = allPlayers.getPlayer(username);
         player.goOnline();
     }
 
@@ -171,7 +173,6 @@ public class ServerThread extends Thread implements Comparable {
         String str;
 
         while (!canPlay) {
-            out.println("Register [0] or login [1]?");
             str = in.readLine();
 
             switch (str) {

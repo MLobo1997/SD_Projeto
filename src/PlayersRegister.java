@@ -1,10 +1,7 @@
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 
 /** Classe utilizada para registar todos o utilizadores existentes até ao momento.
  *
@@ -27,20 +24,10 @@ public class PlayersRegister implements Serializable {
     /**
      * Saber qual o jogador associado a dadas credenciais
      * @param username Nome do jogador
-     * @param password Password do jogador
      * @return Apontador para o jogador, null se não encontrado
      */
-    public synchronized Player getPlayer(String username,String password) {
-        Player currPlayer; // procura atual
-        for (Map.Entry<String,Player> entry : players.entrySet()) {
-            currPlayer =  entry.getValue();
-            if (currPlayer.getUsername().equals(username)) {
-               return currPlayer;
-            }
-        }
-        // Procura falhou, nada encontrado
-        return null;
-
+    public synchronized Player getPlayer(String username) {
+        return players.get(username);
     }
 
     /**
@@ -68,19 +55,10 @@ public class PlayersRegister implements Serializable {
     /**
      * Credenciais existem no sistema?
      * @param username Nome que utilizador inseriu
-     * @param password Password que o utilizador inseriu
      * @return Resposta: tuplo existe ou não na base de dados?
      */
-    public boolean playerExists(String username,String password) {
-        Player currPlayer; // procura atual
-        for (Map.Entry<String,Player> entry : players.entrySet()) {
-            currPlayer = entry.getValue();
-            if ( (currPlayer.getUsername().equals(username))) {
-                return true;
-            }
-        }
-        // Falhou encontrar um utilizador com esses valores
-        return false;
+    public boolean playerExists(String username) {
+        return players.containsKey(username);
     }
 
     /** Verifica se uma instância de Player tem a password correta.
