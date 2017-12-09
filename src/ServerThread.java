@@ -3,26 +3,34 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  *
  */
 public class ServerThread extends Thread implements Comparable {
-    // Connection info
-    /** Buffer de leitura de comunições do cliente*/
-    private BufferedReader in;
-    /** Buffer de escrita de comunições para o cliente*/
-    private PrintWriter out;
-    /** Socket estabelecido entre o servidor e o cliente */
+    /**  ----- Connection info ----- */
+    /** Socket que liga cliente a ServerThread */
     private Socket socket;
+    /** Input stream retirado da socket */
+    private BufferedReader in;
+    /** Output stream retirado da socket */
+    private PrintWriter out;
 
-    // Game info
-    /** Barreira dinâmica que aloca jogadores e faz correspondentes threads esperar até match ser encontrado */
-    private Barrier matchmaker;
-    /** Registo de todas as contas. */
+    /**  ----- Game info  ----- */
+    /**  ----- Player ----- */
+    /** Registo de todos os jogadores - recurso partilhado do servidor principal */
     private PlayersRegister allPlayers;
-    /** Jogador ao qual esta thread está dedicada*/
+    /** Jogador atual que a serverThread está a servir , null caso nenhum */
     private Player player;
+    /** Nome do jogador em formato de prefixo chat: username -> [username]: */
+    private String wrappedUsername;
+    /**  ----- Match ----- */
+    /** Jogo atual ao qual jogador está alocado , null caso em nenhum */
+    private Match currentMatch;
+    /** Serviço de matchmaking, encarregue de bloquear threads até um jogo nas condições certas ser encontrado */
+    private Barrier matchmaker;
 
     /** Construtor de server thread, em que estabelece já os buffers de comunicação.
      *
@@ -67,9 +75,22 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
+    /**
+     * Usar outputstream da serverthread por terceiros para imprimir algo
+     * @param line linha a imprimir
+     */
     public void printToOutput(String line) {
         out.println(line);
     }
+
+    /**
+     * Associar um jogo à thread que serve um cliente
+     * @param m jogo a associar
+     */
+    public void associateMatch(Match m) {
+        currentMatch = m;
+    }
+
 
     /**
      * Recebe input do utilizador e regista na base de dados
@@ -132,6 +153,8 @@ public class ServerThread extends Thread implements Comparable {
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
         player = allPlayers.getPlayer(username);
         player.goOnline();
+        // Atualizar nome da thread para servir de identificador de chat
+        wrappedUsername = "[" + player.getUsername() + "]: ";
     }
 
     /**
@@ -164,13 +187,14 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
-    /** Faz o login ou registo do cliente.
-     *
+    /**
+     * Protocolo de especificação de intenções do cliente pré-jogo (registar ou fazer login)
      * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
-    public void connectUser() throws IOException{
+    public void connectUser() throws IOException {
         boolean canPlay = false;
         String str;
+        // TODO: Deixar a qualquer momento alternar entre modos (com keywords reservadas como por exemplo <REGISTER>
 
         while (!canPlay) {
             str = in.readLine();
@@ -190,19 +214,56 @@ public class ServerThread extends Thread implements Comparable {
             }
         }
     }
+    /**
+     * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
+     * @param line
+     */
+    public void echoMessage(String line) {
+        for (ServerThread st : currentMatch.getPlayers()) {
+            st.printToOutput(line);
+        }
+    }
 
-    public void run(){
+
+    public void initGame() {
+
+        try {
+            // Mensagem de input
+            String str = in.readLine();
+
+            // Timestamp de quando a mensagem foi enviada
+            String timestamp;
+            while(!str.equals("quit")) {
+                timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
+                echoMessage(timestamp + wrappedUsername + str);
+                str = in.readLine();
+            }
+        } catch (IOException |NullPointerException e) {
+            cleanup();
+        }
+    }
+
+    public void run() {
 
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
         try {
+            // Deixar cliente fazer login / registo
             connectUser();
-            // look for match
+
+            // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
+            commandMode();
+
+            // Procurar jogo e ficar inoperável até encontrar
             matchmaker.waitGame(this);
 
+            // Iniciar protocolo de jogo, isto acontece porque:
+            // Possuimos um Player
+            // Possuimos um Match
+            initGame();
+
             cleanup();
-        } catch (IOException | NullPointerException e) {
-            System.out.println("Client left");
-            cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

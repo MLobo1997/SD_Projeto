@@ -7,8 +7,11 @@ public class Match extends Thread {
         this.players = players;
     }
 
+    public TreeSet<ServerThread> getPlayers() {
+        return players;
+    }
+
     public void run() {
-        // TODO: Implement chat
         for (ServerThread st : players) {
             st.printToOutput("Welcome to the match!");
         }

@@ -35,6 +35,7 @@ public class Server {
 
     public static void main(String [] args){
         // TODO: Iniciar implementação gráfica
+        // TODO: Monitor de servidor (para permitir sair seguramente e só aí guardar registos)
         try {
             Server s = new Server();
             s.runServer();
