@@ -203,13 +203,14 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
-    /** Faz o login ou registo do cliente.
-     *
+    /**
+     * Protocolo de especificação de intenções do cliente pré-jogo (registar ou fazer login)
      * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
-    public void connectUser() throws IOException{
+    public void connectUser() throws IOException {
         boolean canPlay = false;
         String str;
+        // TODO: Deixar a qualquer momento alternar entre modos (com keywords reservadas como por exemplo <REGISTER>
 
         while (!canPlay) {
             str = in.readLine();
@@ -255,27 +256,57 @@ public class ServerThread extends Thread implements Comparable {
             cleanup();
         }
     }
+    /**
+     * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
+     * @param line
+     */
+    public void echoMessage(String line) {
+        for (ServerThread st : currentMatch.getPlayers()) {
+            st.printToOutput(line);
+        }
+    }
 
-    public void run(){
+
+    public void initGame() {
+
+        try {
+            // Mensagem de input
+            String str = in.readLine();
+
+            // Timestamp de quando a mensagem foi enviada
+            String timestamp;
+            while(!str.equals("quit")) {
+                timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
+                echoMessage(timestamp + wrappedUsername + str);
+                str = in.readLine();
+            }
+        } catch (IOException |NullPointerException e) {
+            cleanup();
+        }
+    }
+
+    public void run() {
 
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
         try {
+            // Deixar cliente fazer login / registo
             connectUser();
-            // look for match
+
+            // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
+            commandMode();
+
+            // Procurar jogo e ficar inoperável até encontrar
             matchmaker.waitGame(this);
 
-        // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
-        commandMode();
+            // Iniciar protocolo de jogo, isto acontece porque:
+            // Possuimos um Player
+            // Possuimos um Match
+            initGame();
 
-        // Procurar jogo e ficar inoperável até encontrar
-        matchmaker.waitGame(this);
-
-        // Iniciar protocolo de jogo, isto acontece porque:
-        // Possuimos um Player
-        // Possuimos um Match
-        initGame();
-
-        cleanup();
+            cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

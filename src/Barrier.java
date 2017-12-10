@@ -11,7 +11,7 @@ public class Barrier {
      * que as linhas representam o intervalo de valores (entre inteiros) de ranking em que os jogadores se encontram.
      * E.g.: Um jogador com uma média de ranking 4.33 estará contido na 4a entrada.
      */
-    private List<TreeSet<Player>> playersWaiting;
+    private List<TreeSet<ServerThread>> playersWaiting;
     /**Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
     private int[] playersEntering;
     /**Número de jogadores por jogada.*/
@@ -80,7 +80,7 @@ public class Barrier {
         if (playersEntering[lobbyIndex] % size == 1) {
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
         }
 
         System.out.println(playersWaiting);
