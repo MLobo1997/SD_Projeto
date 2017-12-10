@@ -121,7 +121,6 @@ public class ServerThread extends Thread implements Comparable {
 
                 if(!repeat) {
                     allPlayers.addPlayer(new Player(username, password));
-                    System.out.println("Utilizador registado");
                     repeat = false;
                 }
             }
@@ -168,7 +167,7 @@ public class ServerThread extends Thread implements Comparable {
         }
 
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
-        player = p; //TODO:fazer clone
+        player = p.clone();
         player.goOnline();
         // Atualizar nome da thread para servir de identificador de chat
         wrappedUsername = "[" + player.getUsername() + "]: ";
@@ -189,6 +188,7 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
+    //TODO: documentação
     public void commandMode() {
         String str = null;
 
