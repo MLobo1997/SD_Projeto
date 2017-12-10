@@ -166,7 +166,7 @@ public class ServerThread extends Thread implements Comparable {
         }
 
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
-        player = p.clone();
+        player = p; //TODO: É suposto por um clone aqui ou cagamos no encapsulamento? Se for para fazer clone, vai dar trabalhinho
         player.goOnline();
         // Atualizar nome da thread para servir de identificador de chat
         wrappedUsername = "[" + player.getUsername() + "]: ";
