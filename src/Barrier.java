@@ -35,6 +35,7 @@ public class Barrier {
         for (int i = 0; i < size; i++) {
             playersWaiting.add(i,new TreeSet<>());
         }
+        players = new HashSet<>();
     }
 
     /**
@@ -50,7 +51,7 @@ public class Barrier {
         int rankCap = (int) Math.floor(player.getRanking());
 
         // Como jogador irá para o indice rankJogador - 1, lidar com o caso de excessão rank = 0;
-        int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1);
+        int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1); //ENTAO PORQUE??????? O JOGADOR COM 1.3 DE RANKING NAO DEVE IR PARA O INDICE 1????
 
         // Lida com caso de exceção em que se fores de rank 0 serias associado ao indice -1
         playersEntering[lobbyIndex]++;
