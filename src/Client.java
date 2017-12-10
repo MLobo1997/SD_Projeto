@@ -10,6 +10,7 @@ public class Client {
     private BufferedReader scanner = null;
     private BufferedReader is      = null;
     private PrintWriter os         = null;
+    //TODO: Justifica-se colocar Player?
 
     public Client() {
         try {
@@ -25,7 +26,7 @@ public class Client {
     public static void main(String args[]){
         Client client = new Client();
 
-        client.connectUser();
+        Player player = client.connectUser(); //TODO: Justifica-se colocar Player?
 
         // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
         new ClientDaemon(client.socket).start();
@@ -34,6 +35,10 @@ public class Client {
 
     }
 
+    /** Faz o registo e/ou login de um utilizador ao sistema.
+     *
+     * @return Informação do jogador.
+     */
     private Player connectUser(){
         Player p = null;
         String tmp;
@@ -47,20 +52,22 @@ public class Client {
 
             if(tmp.equals("0")){
                 registerPlayer();
-                loginPlayer();
+                p = loginPlayer();
             }
             else if(tmp.equals("1")){
-                loginPlayer();
+                p = loginPlayer();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
         return p;
     }
 
+    /** Faz o registo de um jogador no sistema.
+     *
+     */
     private void registerPlayer() {
         String username = null , password, tmp;
         Boolean check = false, repeat = false;
@@ -104,6 +111,10 @@ public class Client {
         System.out.println("Registado com sucesso!");
     }
 
+    /** Faz o login dum cliente no sistema.
+     *
+     * @return Informação do cliente.
+     */
     public Player loginPlayer(){
         String username, password, tmp = null, response = null;
         Boolean check = false;

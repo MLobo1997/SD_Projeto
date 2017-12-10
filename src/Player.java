@@ -3,7 +3,7 @@ import java.io.Serializable;
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player implements Serializable, Comparable {
+public class Player implements Serializable, Cloneable {
     /** Nome do utilizador. */
     private String name;
     /** Passe de acesso do utilizador. */
@@ -26,6 +26,18 @@ public class Player implements Serializable, Comparable {
         online        = false;
         nrOfGames     = 0;
         ranking       = 0.0;
+    }
+
+    /** Construtor por cópia.
+     *
+     * @param p Instância de jogador a ser copiada.
+     */
+    public Player(Player p){
+        this.name = p.name;
+        this.password = p.password;
+        this.online = p.online;
+        this.nrOfGames = p.nrOfGames;
+        this.ranking = p.ranking;
     }
 
     public static void main(String [] args){
@@ -101,6 +113,14 @@ public class Player implements Serializable, Comparable {
         return (this.password.equals(password));
     }
 
+    /** Método de clonagem de um objeto.
+     *
+     * @return Cópia do objeto.
+     */
+    public Player clone(){
+        return new Player(this);
+    }
+
     /** Método de debug.
      *
      * @return Leitura do objeto em String.
@@ -109,7 +129,6 @@ public class Player implements Serializable, Comparable {
     public String toString() {
         return "Player{" +
                 ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +
                 '}';
