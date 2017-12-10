@@ -96,26 +96,34 @@ public class ServerThread extends Thread implements Comparable {
      */
     public void registerPlayer() {
         try {
-            // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(0 ou 1)
+            // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(y ou n)
             String username = null;
             String password = null;
             boolean isRegistered = false;
+            boolean repeat = true;
 
-            while (!isRegistered) {
+
+            while (repeat) {  //0 no caso de ser a 1a vez ou o cliente ja existir, -1 se tiver sido cancelado o processo
                 do {
-                    if(username != null)
-                        out.println("0");
+
+                    if(isRegistered)
+                        out.println("0"); //diz que o jogador já existia
+
                     username = in.readLine();
-                    System.out.println(username);
-                } while (allPlayers.playerExists(username));
-                out.println("1");
+                    password = in.readLine();
 
-                password = in.readLine();
-                isRegistered = in.readLine().equals("1");
+                    isRegistered = allPlayers.playerExists(username);
+                } while (isRegistered);
+                out.println("1"); //diz que o jogador não existe
+
+                repeat = in.readLine().equals("0");
+
+                if(!repeat) {
+                    allPlayers.addPlayer(new Player(username, password));
+                    System.out.println("Utilizador registado");
+                    repeat = false;
+                }
             }
-
-            allPlayers.addPlayer(new Player(allPlayers.size() + 1,username,password));
-
 
         } catch (IOException e) {
             System.out.println("Client left");
@@ -126,31 +134,40 @@ public class ServerThread extends Thread implements Comparable {
      * Recebe input do utilizador e verifica se está na base de dados
      */
     public void loginPlayer() {
-        // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido
+        // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido. Erro 0 se não existir, -1 se a passe estiver errada, -2 se já estiver online
         String username  = null;
         String password  = null;
         boolean isLogged = false;
+        Player p = null;
+        boolean check = false;
 
         try {
-            while (!isLogged) {
-                out.println("Username:");
+            while(!check) {
                 username = in.readLine();
-                out.println("Password:");
                 password = in.readLine();
-                Player foundPlayer = allPlayers.getPlayer(username);
-                // Garantir que jogador existe e, caso exista, que não tem outro cliente a usa-lo atualmente
-                if ( (foundPlayer != null) && (!foundPlayer.isOnline()) ) {
-                    isLogged = true;
-                } else {
-                    out.println("Login failed (account doesn't exist or already being used)");
+
+                p = allPlayers.getPlayer(username);
+
+                if(p == null){ //se o jogador não existe, enviar erro 0
+                    out.println("0");
+                }
+                else if(!p.passwordEquals(password)){ //se a pass estiver errada, envia erro -1
+                    out.println("-1");
+                }
+                else if(p.isOnline()){ //se o utilizador ja estiver online, envia erro -2
+                    out.println("-2");
+                }
+                else {
+                    out.println("1");
+                    check = true;
                 }
             }
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Login funcionou: atualizar a thread para ter agora referencia ao jogador
-        player = allPlayers.getPlayer(username);
+        player = p; //TODO:fazer clone
         player.goOnline();
         // Atualizar nome da thread para servir de identificador de chat
         wrappedUsername = "[" + player.getUsername() + "]: ";

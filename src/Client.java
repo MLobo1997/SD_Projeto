@@ -47,11 +47,10 @@ public class Client {
 
             if(tmp.equals("0")){
                 registerPlayer();
-
-                //TODO:login
+                loginPlayer();
             }
             else if(tmp.equals("1")){
-                //TODO:login
+                loginPlayer();
             }
 
         } catch (IOException e) {
@@ -59,6 +58,91 @@ public class Client {
         }
 
 
+        return p;
+    }
+
+    private void registerPlayer() {
+        String username = null , password, tmp;
+        Boolean check = false, repeat = false;
+
+        try {
+            while (!check) {
+                System.out.println("----Registe o jogador---");
+                do { // while até o user ainda não ter sido inserido
+                    //begin username
+                    if (!repeat && username != null)
+                        System.out.println("O user " + username + " já existe!");
+                    repeat = false;
+                    System.out.println("Username:");
+                    username = scanner.readLine();
+                    os.println(username);
+
+                    //begin password
+                    System.out.println("Password:");
+                    password = scanner.readLine();
+                    os.println(password);
+                } while ((tmp = is.readLine()).equals("0"));
+
+                if (tmp.equals("1")) {
+                    do {
+                        System.out.println("Confirma [y/n]");
+                        tmp = scanner.readLine();
+                        if (tmp.equals("y")) {
+                            check = true;
+                            os.println("1"); //transmite o 'yes'
+                        } else if (tmp.equals("n")) {
+                            os.println("0"); //transmite o 'no'
+                            repeat = true;
+                        }
+                    } while (!tmp.equals("y") && !tmp.equals("n")); //repete o confirma no caso de não ter recebido 'y' nem 'n'
+                }
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        System.out.println("Registado com sucesso!");
+    }
+
+    public Player loginPlayer(){
+        String username, password, tmp = null, response = null;
+        Boolean check = false;
+        Player p = null;
+
+        try {
+            while(!check){
+                System.out.println("---Login---");
+
+                System.out.println("Username:");
+                username = scanner.readLine();
+                os.println(username);
+
+                System.out.println("Password:");
+                password = scanner.readLine();
+                os.println(password);
+
+                response = is.readLine();
+                if(response.equals("0")){
+                    System.out.println("O utilizador não existe!!");
+                }
+                else if(response.equals("-1")){
+                    System.out.println("A password está errada!");
+                }
+                else if(response.equals("-2")){
+                    System.out.println("O utilizador já se encontra online!");
+                }
+                else if(response.equals("1")){
+                    System.out.println("Login sucedido!");
+                    check = true;
+                }
+
+                p = new Player(username, password);
+                p.goOnline();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return p;
     }
     /**
@@ -90,41 +174,5 @@ public class Client {
         }
     }
 
-    private void registerPlayer() {
-        String username = null , password = null, tmp = null;
-        Boolean check = false;
-
-        try {
-            while (!check) {
-                do {
-                    if (username != null)
-                        System.out.println("O user " + username + " já existe!");
-                    System.out.println("Username:");
-                    username = scanner.readLine();
-                    os.println(username);
-
-                } while ((tmp = is.readLine()).equals("0"));
-
-                if (tmp.equals("1")) {
-
-                    System.out.println("Password:");
-                    password = scanner.readLine();
-                    os.println(password);
-
-                    System.out.println("Are you sure? [y/n]");
-                    tmp = scanner.readLine();
-                    if(tmp.equals("y")) {
-                        check = true;
-                        os.println("1");
-                    }
-
-                }
-            }
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-        System.out.println("Registado com sucesso!");
-    }
 }
 

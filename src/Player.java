@@ -20,8 +20,8 @@ public class Player implements Serializable, Comparable {
      * @param name Nome do utilizador.
      * @param password Passe de acesso.
      */
-    public Player(Integer ID, String name, String password) {
-        this.name = name;
+    public Player(String name, String password) {
+        this.name     = name;
         this.password = password;
         online        = false;
         nrOfGames     = 0;
@@ -94,11 +94,11 @@ public class Player implements Serializable, Comparable {
 
     /**Verifica se as passes entre as duas instâncias de jogador correspondem.
      *
-     * @param other Outro jogador.
+     * @param password Outro jogador.
      * @return True se correspondem.
      */
-    public boolean passwordEquals(Player other){
-        return (this.password.equals(other.password));
+    public boolean passwordEquals(String password){
+        return (this.password.equals(password));
     }
 
     /** Método de debug.
