@@ -64,6 +64,8 @@ public class ServerThread extends Thread implements Comparable {
      */
     public void cleanup() {
         try {
+            System.out.println(player.getUsername() + " a ser desconectado");
+
             in.close();
             out.close();
             socket.close();
@@ -187,19 +189,32 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
-    //TODO: documentação
+    /** Método chamado após o login do jogador com o ituito de comunicar  com o mesmo e responder às suas decisões (como jogar, sair, etc.)
+     *
+     */
     public void commandMode() {
-        String str = null;
+        String cmd = null;
 
-        while (true) {
-            try {
-                str = in.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (str.equals("play")) {
-                break;
-            }
+        try {
+
+            do {
+                cmd = in.readLine();
+
+                if (cmd.equals("1")){
+                    System.out.println(player.getUsername() + " wants to play a game");
+                    // Procurar jogo e ficar inoperável até encontrar
+                    matchmaker.waitGame(this);
+
+                    // Iniciar protocolo de jogo, isto acontece porque:
+                    // Possuimos um Player
+                    // Possuimos um Match
+                    initGame();
+                }
+            } while (!cmd.equals("0"));
+            cleanup();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -269,15 +284,6 @@ public class ServerThread extends Thread implements Comparable {
             // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
             commandMode();
 
-            // Procurar jogo e ficar inoperável até encontrar
-            matchmaker.waitGame(this);
-
-            // Iniciar protocolo de jogo, isto acontece porque:
-            // Possuimos um Player
-            // Possuimos um Match
-            initGame();
-
-            cleanup();
         } catch (IOException e) {
             e.printStackTrace();
         }

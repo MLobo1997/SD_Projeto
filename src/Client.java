@@ -23,17 +23,6 @@ public class Client {
         }
     }
 
-    public static void main(String args[]){
-        Client client = new Client();
-
-        Player player = client.connectUser(); //TODO: Justifica-se colocar Player?
-
-        // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
-        new ClientDaemon(client.socket).start();
-
-        client.findMatch();
-
-    }
 
     /** Faz o registo e/ou login de um utilizador ao sistema.
      *
@@ -55,7 +44,7 @@ public class Client {
                 p = loginPlayer();
             }
             else if(tmp.equals("1")){
-                p = loginPlayer();
+                p = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
             }
 
         } catch (IOException e) {
@@ -156,6 +145,23 @@ public class Client {
         }
         return p;
     }
+
+    /** Desconecta o utilizador localmente.
+     *
+     */
+    public void disconnectUser (){
+        System.out.println("Desligando do sistema.");
+
+        try {
+            is.close();
+            os.close();
+            socket.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error closing connections");
+        }
+    }
+
     /**
      * Ler informação do cliente necessária para inicializar jogo
      */
@@ -185,5 +191,67 @@ public class Client {
         }
     }
 
+    /** Inicia o menu do jogo após o login e permite ao jogador escolher o que quer fazer a seguir (e.g.: jogar, sair do programa, outras cenas que podemos inventar)
+     *
+     * @return Valor que identifica a opção do jogador (-1 -> ocorreu um erro ; 0 -> desistir; 1 -> jogar)
+     */
+    public int startMenu(){
+        String cmd;
+
+        try {
+
+            do {
+                System.out.println("O que vosse mecê deseja fazer?");
+                System.out.println("Jogar [p], sair [q]?:");
+
+                cmd = scanner.readLine();
+
+                if (cmd.equals("q")){
+                    os.println("0");
+                    return 0;
+                }
+                else if (cmd.equals("p")){
+                    os.println("1");
+                    return 1;
+                }
+
+            } while (!cmd.equals("p") && !cmd.equals("q")); //se o valor inserido não for válido, repete o processo
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        os.println("-1"); //Avisa o servidor do erro.
+        return -1; //Se chegar aqui é porque algo correu mal.
+    }
+
+    /** Método que faz o processamento após o login.
+     *
+     */
+    public void init(){
+        Thread t = new ClientDaemon(socket);
+        int cmd;
+        do {
+            cmd = startMenu();
+
+            if (cmd == 1){
+                // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
+                t.start();
+                findMatch();
+                t.interrupt();
+            }
+        } while (cmd != 0);
+        disconnectUser();
+    }
+
+    public static void main(String args[]){
+        int cmd;
+
+        Client client = new Client();
+
+        Player player = client.connectUser(); //TODO: Justifica-se colocar Player?
+
+        client.init();
+    }
 }
 
