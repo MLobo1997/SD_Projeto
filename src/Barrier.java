@@ -38,6 +38,12 @@ public class Barrier {
         players = new HashSet<>();
     }
 
+    public void informThreadsOfAddedMatch(TreeSet<ServerThread> playerThreads,Match match) {
+        for (ServerThread st : playerThreads) {
+            st.associateMatch(match);
+        }
+    }
+
     /**
      * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar
       * @param st thread que presta serviços ao cliente
@@ -58,8 +64,17 @@ public class Barrier {
 
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] % size == 0) {
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
+            Match match = new Match(playersWaiting.get(lobbyIndex));
+            informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
+            match.run();
             notifyAll();
+
+            try {
+                match.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (playersEntering[lobbyIndex] % size == 1) {
