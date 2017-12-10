@@ -228,6 +228,8 @@ public class ServerThread extends Thread implements Comparable {
                 default:
                     break;
             }
+        }
+    }
     /**
      * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
      * @param line
@@ -247,34 +249,6 @@ public class ServerThread extends Thread implements Comparable {
 
         // Timestamp de quando a mensagem foi enviada
         String timestamp;
-            while(!str.equals("quit")) {
-                timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
-                echoMessage(timestamp + wrappedUsername + str);
-                str = in.readLine();
-            }
-        } catch (IOException |NullPointerException e) {
-            cleanup();
-        }
-    }
-    /**
-     * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
-     * @param line
-     */
-    public void echoMessage(String line) {
-        for (ServerThread st : currentMatch.getPlayers()) {
-            st.printToOutput(line);
-        }
-    }
-
-
-    public void initGame() {
-
-        try {
-            // Mensagem de input
-            String str = in.readLine();
-
-            // Timestamp de quando a mensagem foi enviada
-            String timestamp;
             while(!str.equals("quit")) {
                 timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
                 echoMessage(timestamp + wrappedUsername + str);
