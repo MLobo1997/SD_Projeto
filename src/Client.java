@@ -54,12 +54,11 @@ public class Client {
     public static void main(String args[]){
         Client client = new Client();
 
-        // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input
+        // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
         new ClientDaemon(client.socket).start();
 
         client.findMatch();
 
     }
-
 }
 
