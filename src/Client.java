@@ -10,7 +10,6 @@ public class Client {
     private BufferedReader scanner = null;
     private BufferedReader is      = null;
     private PrintWriter os         = null;
-    //TODO: Justifica-se colocar Player?
 
     public Client() {
         try {
@@ -215,7 +214,7 @@ public class Client {
                     return 1;
                 }
 
-            } while (!cmd.equals("p") && !cmd.equals("q")); //se o valor inserido não for válido, repete o processo
+            } while (!cmd.equals("p") && !cmd.equals("q")); // se o valor inserido não for válido, repete o processo
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -249,7 +248,7 @@ public class Client {
 
         Client client = new Client();
 
-        Player player = client.connectUser(); //TODO: Justifica-se colocar Player?
+        Player player = client.connectUser();
 
         client.init();
     }
