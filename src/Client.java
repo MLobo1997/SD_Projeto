@@ -12,7 +12,7 @@ public class Client {
     private PrintWriter os         = null;
     //TODO: Justifica-se colocar Player?
 
-    public Client() {
+    private Client() {
         try {
             scanner = new BufferedReader(new InputStreamReader(System.in));
             socket  = new Socket("127.0.0.1",9999);
@@ -28,8 +28,9 @@ public class Client {
      *
      * @return Informação do jogador.
      */
-    private Player connectUser(){
-        Player p = null;
+    private void connectUser(){
+        boolean loggedIn = false;
+        boolean toReg = true; //true se for para fazer registo false se for para fazer login
         String tmp;
 
         try {
@@ -37,21 +38,59 @@ public class Client {
                 System.out.println("Register [0] or login [1]?");
                 tmp = scanner.readLine();
             } while (!tmp.equals("0") && !tmp.equals("1"));
-            os.println(tmp);
+            os.println(tmp); //dizer ao servidor que é para fazer registo
 
-            if(tmp.equals("0")){
-                registerPlayer();
-                p = loginPlayer();
-            }
-            else if(tmp.equals("1")){
-                p = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
+            switch (tmp) {
+                case "0":
+                    toReg = true;
+                    break;
+                case "1":
+                    toReg = false;
+                    break;
             }
 
+            while (!loggedIn) {
+                if (toReg) {
+                    registerPlayer();
+                    loggedIn = loginPlayer();
+                } else {
+                    loggedIn = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
+                    if(!loggedIn){
+                        toReg = true;
+                    }
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        return p;
+    /** Verifica se num registo é para avançar para o login e comunica essa decisão para o servidor.
+     *
+     * @return Booleano com resultado, true se for para avançar.
+     * @throws IOException
+     */
+    private boolean checkIfSkip() throws IOException{
+        String tmp = null;
+        boolean skip = false;
+
+        do {
+            if (tmp != null)
+                System.out.println("[y/n]");
+            tmp = scanner.readLine();
+            switch (tmp) {
+                case "y":
+                    skip = true;
+                    os.println("-1"); //comunica ao servidor que é para saltar. TODO substituir para 1
+
+                    break;
+                case "n":
+                    os.println("0"); //comunica ao servidor que é para tentar outra vez
+                    break;
+            }
+        } while (!tmp.equals("y") && !tmp.equals("n")); //repete o confirma no caso de não ter recebido 'y' nem 'n'
+
+        return skip;
     }
 
     /** Faz o registo de um jogador no sistema.
@@ -59,16 +98,13 @@ public class Client {
      */
     private void registerPlayer() {
         String username = null , password, tmp;
-        Boolean check = false, repeat = false;
+        Boolean check = false, skip = false, alreadyRegistered ;
 
         try {
-            while (!check) {
+            while (!check && !skip) {
                 System.out.println("----Registe o jogador---");
-                do { // while até o user ainda não ter sido inserido
+                do { // while até ser utilizado um username que ainda não foi registado
                     //begin username
-                    if (!repeat && username != null)
-                        System.out.println("O user " + username + " já existe!");
-                    repeat = false;
                     System.out.println("Username:");
                     username = scanner.readLine();
                     os.println(username);
@@ -77,40 +113,56 @@ public class Client {
                     System.out.println("Password:");
                     password = scanner.readLine();
                     os.println(password);
-                } while ((tmp = is.readLine()).equals("0"));
 
-                if (tmp.equals("1")) {
+                    tmp = is.readLine();
+                    alreadyRegistered = tmp.equals("0"); //verifica se já não existe
+
+                    if(alreadyRegistered){ //se já existe, pergunta se quer avançar para o login
+                        System.out.println("O username " + username + " já se encontra registado. Deseja mudar para login? [y/n]");
+                        skip = checkIfSkip();
+                    }
+                } while (alreadyRegistered && !skip);
+
+                if (tmp.equals("1")) { //No caso de tudo funcionar direito
                     do {
                         System.out.println("Confirma [y/n]");
                         tmp = scanner.readLine();
                         if (tmp.equals("y")) {
                             check = true;
-                            os.println("1"); //transmite o 'yes'
+                            os.println("1"); //transmite o 'yes' TODO UTILIZAR YESORNO
                         } else if (tmp.equals("n")) {
                             os.println("0"); //transmite o 'no'
-                            repeat = true;
                         }
                     } while (!tmp.equals("y") && !tmp.equals("n")); //repete o confirma no caso de não ter recebido 'y' nem 'n'
+                }
+
+                if(!check && !skip){ //No caso de algo tiver dado para o torto, pergunta se não quer avançar para o login.
+                    System.out.println("Deseja mudar para login? [y/n]");
+                    skip = checkIfSkip();
                 }
             }
         }
         catch(IOException e){
             e.printStackTrace();
         }
-        System.out.println("Registado com sucesso!");
+        if (check) {
+            System.out.println("Registado com sucesso!");
+        }
+        else if(skip){
+            System.out.println("A avançar para o login");
+        }
     }
 
     /** Faz o login dum cliente no sistema.
      *
      * @return Informação do cliente.
      */
-    public Player loginPlayer(){
+    private boolean loginPlayer(){
         String username, password, tmp = null, response = null;
-        Boolean check = false;
-        Player p = null;
+        boolean check = false, skip = false;
 
         try {
-            while(!check){
+            while(!check && !skip){
                 System.out.println("---Login---");
 
                 System.out.println("Username:");
@@ -122,34 +174,37 @@ public class Client {
                 os.println(password);
 
                 response = is.readLine();
-                if(response.equals("0")){
-                    System.out.println("O utilizador não existe!!");
-                }
-                else if(response.equals("-1")){
-                    System.out.println("A password está errada!");
-                }
-                else if(response.equals("-2")){
-                    System.out.println("O utilizador já se encontra online!");
-                }
-                else if(response.equals("1")){
-                    System.out.println("Login sucedido!");
-                    check = true;
+                switch (response) {
+                    case "0":
+                        System.out.println("O utilizador não existe!!");
+                        break;
+                    case "-1":
+                        System.out.println("A password está errada!");
+                        break;
+                    case "-2":
+                        System.out.println("O utilizador já se encontra online!");
+                        break;
+                    case "1":
+                        System.out.println("Login sucedido!");
+                        check = true;
+                        break;
                 }
 
-                p = new Player(username, password);
-                p.goOnline();
+                if(!check){
+                    System.out.println("Queres fazer um registo? [y/n]");
+                    skip = checkIfSkip();
+                }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return p;
+        return check;
     }
 
     /** Desconecta o utilizador localmente.
      *
      */
-    public void disconnectUser (){
+    private void disconnectUser (){
         System.out.println("Desligando do sistema.");
 
         try {
@@ -165,7 +220,7 @@ public class Client {
     /**
      * Ler informação do cliente necessária para inicializar jogo
      */
-    public void findMatch() {
+    private void findMatch() {
         try {
             String lineInput = scanner.readLine();
             while (!lineInput.equals("quit")) {
@@ -195,7 +250,7 @@ public class Client {
      *
      * @return Valor que identifica a opção do jogador (-1 -> ocorreu um erro ; 0 -> desistir; 1 -> jogar)
      */
-    public int startMenu(){
+    private int startMenu(){
         String cmd;
 
         try {
@@ -228,7 +283,7 @@ public class Client {
     /** Método que faz o processamento após o login.
      *
      */
-    public void init(){
+    private void init(){
         Thread t = new ClientDaemon(socket);
         int cmd;
         do {
@@ -249,7 +304,7 @@ public class Client {
 
         Client client = new Client();
 
-        Player player = client.connectUser(); //TODO: Justifica-se colocar Player?
+        client.connectUser(); //TODO: Justifica-se colocar Player?
 
         client.init();
     }
