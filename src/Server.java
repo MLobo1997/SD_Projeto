@@ -33,15 +33,6 @@ public class Server {
         server          = new ServerSocket(9999);
     }
 
-    public static void main(String [] args){
-        // TODO: Iniciar implementação gráfica
-        try {
-            Server s = new Server();
-            s.runServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Carrega da base de dados a lista de utilizadores que se encontra na diretoria de trabalho
@@ -78,6 +69,17 @@ public class Server {
             catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void main(String [] args){
+        // TODO: Iniciar implementação gráfica
+        // TODO: Monitor de servidor (para permitir sair seguramente e só aí guardar registos)
+        try {
+            Server s = new Server();
+            s.runServer();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

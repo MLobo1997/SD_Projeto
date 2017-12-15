@@ -11,7 +11,7 @@ public class Barrier {
      * que as linhas representam o intervalo de valores (entre inteiros) de ranking em que os jogadores se encontram.
      * E.g.: Um jogador com uma média de ranking 4.33 estará contido na 4a entrada.
      */
-    private List<TreeSet<Player>> playersWaiting;
+    private List<TreeSet<ServerThread>> playersWaiting;
     /**Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
     private int[] playersEntering;
     /**Número de jogadores por jogada.*/
@@ -35,6 +35,13 @@ public class Barrier {
         for (int i = 0; i < size; i++) {
             playersWaiting.add(i,new TreeSet<>());
         }
+        players = new HashSet<>();
+    }
+
+    public void informThreadsOfAddedMatch(TreeSet<ServerThread> playerThreads,Match match) {
+        for (ServerThread st : playerThreads) {
+            st.associateMatch(match);
+        }
     }
 
     /**
@@ -46,25 +53,34 @@ public class Barrier {
         // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
         Player player = st.getPlayer();
 
-        // Usado para determinar para qual dos lobbies o jogador irá
+        // Usado para determinar para qual dos lobbies jogador irá
         int rankCap = (int) Math.floor(player.getRanking());
 
         // Como jogador irá para o indice rankJogador - 1, lidar com o caso de excessão rank = 0;
-        int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1);
+        int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1); //ENTAO PORQUE??????? O JOGADOR COM 1.3 DE RANKING NAO DEVE IR PARA O INDICE 1????
 
         // Lida com caso de exceção em que se fores de rank 0 serias associado ao indice -1
         playersEntering[lobbyIndex]++;
 
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] % size == 0) {
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
+            Match match = new Match(playersWaiting.get(lobbyIndex));
+            informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
+            match.run();
             notifyAll();
+
+            try {
+                match.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         if (playersEntering[lobbyIndex] % size == 1) {
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
-            playersWaiting.get(lobbyIndex).add(player);
+            playersWaiting.get(lobbyIndex).add(st);
         }
 
         System.out.println(playersWaiting);

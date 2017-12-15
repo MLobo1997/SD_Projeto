@@ -1,14 +1,9 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
-import java.net.Socket;
 
 /**
  * A classe player representa cada um dos utilizadores existentes e guarda toda a informação necessária dos mesmo.
  */
-public class Player implements Serializable, Comparable {
-    /** Número de identificação de um jogador. */
-    private Integer ID;
+public class Player implements Serializable, Cloneable {
     /** Nome do utilizador. */
     private String name;
     /** Passe de acesso do utilizador. */
@@ -17,21 +12,32 @@ public class Player implements Serializable, Comparable {
     private Integer nrOfGames;
     /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos. */
     private Double ranking;
-    /** Socket de comunicação com o servidor, null no caso de não estar conectado*/
-    private Socket socket;
+    /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
+    private boolean online;
 
     /** Método de contrução do objeto Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
      *
      * @param name Nome do utilizador.
      * @param password Passe de acesso.
      */
-    public Player(Integer ID, String name, String password) {
-        this.ID = ID;
-        this.name = name;
+    public Player(String name, String password) {
+        this.name     = name;
         this.password = password;
-        nrOfGames = 0;
-        ranking = 0.0;
-        socket = null;
+        online        = false;
+        nrOfGames     = 0;
+        ranking       = 0.0;
+    }
+
+    /** Construtor por cópia.
+     *
+     * @param p Instância de jogador a ser copiada.
+     */
+    public Player(Player p){
+        this.name = p.name;
+        this.password = p.password;
+        this.online = p.online;
+        this.nrOfGames = p.nrOfGames;
+        this.ranking = p.ranking;
     }
 
     public static void main(String [] args){
@@ -47,15 +53,7 @@ public class Player implements Serializable, Comparable {
      *
      * @return pass.
      */
-    public String getPassword() { return password; }
-
-    /** Getter do ID do jogador.
-     *
-     * @return ID.
-     */
-    public Integer getID() {
-        return ID;
-    }
+    private String getPassword() { return password; }
 
     /** Getter do ranking médio do jogador
      *
@@ -67,6 +65,27 @@ public class Player implements Serializable, Comparable {
 
     public void setRank(double rank) {
         this.ranking = rank;
+    }
+
+    /**
+     * Sinalizar jogador como online
+     */
+    public void goOnline() {
+        online = true;
+    }
+
+    /**
+     * Sinalizar jogador como offline
+     */
+    public void goOffline() {
+        online = false;
+    }
+
+    /**
+     * Sinalizar jogador como online
+     */
+    public boolean isOnline() {
+        return online;
     }
 
     /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
@@ -85,6 +104,23 @@ public class Player implements Serializable, Comparable {
 
     }
 
+    /**Verifica se as passes entre as duas instâncias de jogador correspondem.
+     *
+     * @param password Outro jogador.
+     * @return True se correspondem.
+     */
+    public boolean passwordEquals(String password){
+        return (this.password.equals(password));
+    }
+
+    /** Método de clonagem de um objeto.
+     *
+     * @return Cópia do objeto.
+     */
+    public Player clone(){
+        return new Player(this);
+    }
+
     /** Método de debug.
      *
      * @return Leitura do objeto em String.
@@ -92,21 +128,9 @@ public class Player implements Serializable, Comparable {
     @Override
     public String toString() {
         return "Player{" +
-                "ID=" + ID +
                 ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        int difference = (int) (ranking - ((Player) o).getRanking());
-        if (difference == 0) {
-            return 1; // Para permitir chaves iguais
-        } else {
-            return difference;
-        }
     }
 }
