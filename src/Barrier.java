@@ -18,7 +18,7 @@ public class Barrier {
     /** --------- Info do jogo ------- */
     private List<TreeSet<ServerThread>> playersWaiting;
     /** Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
-    private int[] playersEntering;
+    private int[] playersEntering; // TODO: isto é o playersWaiting.get(lobbyIndex).size(), ver se isto pode ser apagado
     /** Número de ranks */
     private int rankNum;
     /** Número de jogadores por jogo.*/
@@ -110,7 +110,6 @@ public class Barrier {
             }
         } else if (playersEntering[lobbyIndex] == 1) {
             System.out.println("Caso 2");
-            playersWaiting.get(lobbyIndex).add(st);
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
             playersWaiting.get(lobbyIndex).add(st);
@@ -125,6 +124,7 @@ public class Barrier {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
         lockLobbies[lobbyIndex].unlock();
 
