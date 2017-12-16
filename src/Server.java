@@ -64,7 +64,7 @@ public class Server {
             try {
                 socket = server.accept();
                 /* Iniciar novo prestador de serviços para cliente */
-                new ServerThread(socket,allPlayers,matchmaker).start();
+                new Thread(new ServerThread(socket,allPlayers,matchmaker)).start();
             }
             catch (IOException e) {
                 e.printStackTrace();

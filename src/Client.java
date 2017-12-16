@@ -283,7 +283,7 @@ public class Client {
      *
      */
     private void init(){
-        Thread t = new ClientDaemon(socket);
+        Thread t = new Thread(new ClientDaemon(socket));
         int cmd;
         do {
             cmd = startMenu();

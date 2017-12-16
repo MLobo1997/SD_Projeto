@@ -96,22 +96,15 @@ public class Barrier {
 
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] == size) {
-            System.out.println("Caso 1");
             playersWaiting.get(lobbyIndex).add(st);
-            Match match = new Match(playersWaiting.get(lobbyIndex));
+            Match match = new Match(playersWaiting.get(lobbyIndex),size,new ReentrantLock());
             informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
-            match.run();
+            new Thread(match).start();
             gameEpoch[lobbyIndex]++;
             conditionLobbiesAvailable[lobbyIndex].signal();
             playersEntering[lobbyIndex] = 0;
 
-            try {
-                match.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         } else if (playersEntering[lobbyIndex] == 1) {
-            System.out.println("Caso 2");
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
             playersWaiting.get(lobbyIndex).add(st);

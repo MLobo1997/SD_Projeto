@@ -37,7 +37,7 @@ public class PlayersRegister implements Serializable {
      * Numero de jogadores registados
      * @return Número de entradas na hashtable
      */
-    public int size() {
+    public synchronized int size() {
         return players.size();
     }
 
@@ -60,7 +60,7 @@ public class PlayersRegister implements Serializable {
      * @param username Nome que utilizador inseriu
      * @return Resposta: tuplo existe ou não na base de dados?
      */
-    public boolean playerExists(String username) {
+    public synchronized boolean playerExists(String username) {
         return players.containsKey(username);
     }
 

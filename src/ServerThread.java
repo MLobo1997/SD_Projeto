@@ -9,7 +9,7 @@ import java.util.Date;
 /**Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  *
  */
-public class ServerThread extends Thread implements Comparable {
+public class ServerThread implements Comparable, Runnable {
     /**  ------ Connection info ----- */
     /** Socket que liga cliente a ServerThread */
     private Socket socket;
@@ -282,10 +282,34 @@ public class ServerThread extends Thread implements Comparable {
         }
     }
 
+    public void waitForGameToStart() {
+
+        int playerNum = currentMatch.getPlayerNum();
+
+        currentMatch.getMatchLock().lock();
+
+        currentMatch.incrementPlayersReady();
+
+        if  (currentMatch.getThreadsAwoken() == playerNum) {
+            currentMatch.getAllPlayersReadyCondition().signal();
+        }
+
+        while (currentMatch.getThreadsAwoken() != playerNum) {
+            try {
+                currentMatch.getAllPlayersReadyCondition().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        currentMatch.getMatchLock().unlock();
+
+    }
+
 
     public void initGame() {
 
-        System.out.println(currentMatch.getPlayers());
+        waitForGameToStart();
 
         try {
         // Mensagem de input
@@ -293,12 +317,13 @@ public class ServerThread extends Thread implements Comparable {
 
         // Timestamp de quando a mensagem foi enviada
         String timestamp;
-            while(!str.equals("quit")) {
+            while(!(str.equals("quit") || str.equals("$GAMEOVER$"))) {
                 timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
                 echoMessage(timestamp + wrappedUsername + str);
                 str = in.readLine();
             }
-        } catch (IOException |NullPointerException e) {
+
+        } catch (IOException | NullPointerException e) {
             cleanup();
         }
     }
