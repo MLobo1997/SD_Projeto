@@ -5,8 +5,9 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** TODO: dar uma explicação desta classe
- *
+/** Classe que recebe todos os jogadores e associa-os ao lobby correto (matchmaking), fazendo as threads
+ * dos jogadores respetivos esperarem até o lobby estar cheio (controlo de concorrência). Quando libertadas,
+ * as threads executam os protocolos de começar a jogar.
  */
 public class Barrier {
     /** Coleção de jogadores que estão atualmente à espera, registados numa estrutura tipo matricial, em
@@ -94,7 +95,6 @@ public class Barrier {
 
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] == size) {
-            System.out.println("Caso 1");
             playersWaiting.get(lobbyIndex).add(st);
             Match match = new Match(playersWaiting.get(lobbyIndex));
             informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
@@ -109,7 +109,6 @@ public class Barrier {
                 e.printStackTrace();
             }
         } else if (playersEntering[lobbyIndex] == 1) {
-            System.out.println("Caso 2");
             playersWaiting.get(lobbyIndex).add(st);
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
