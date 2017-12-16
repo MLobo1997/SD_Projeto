@@ -10,7 +10,7 @@ import java.util.Date;
  *
  */
 public class ServerThread extends Thread implements Comparable {
-    /**  ----- Connection info ----- */
+    /**  ------ Connection info ----- */
     /** Socket que liga cliente a ServerThread */
     private Socket socket;
     /** Input stream retirado da socket */

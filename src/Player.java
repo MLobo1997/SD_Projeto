@@ -94,6 +94,7 @@ public class Player implements Serializable, Cloneable {
      * @throws IllegalArgumentException Exceção de ter sido dado como argumento um valor não contido em [0, 9].
      */
     public void addGame(Integer rank) throws IllegalArgumentException{
+        // TODO: Atualizar como é feita a atualização dos ranks
         if(rank >= 0 && rank <= 9) {
             ranking = (ranking * nrOfGames + rank) / ((double) nrOfGames + 1);
             nrOfGames++;
