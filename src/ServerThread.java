@@ -285,6 +285,8 @@ public class ServerThread extends Thread implements Comparable {
 
     public void initGame() {
 
+        System.out.println(currentMatch.getPlayers());
+
         try {
         // Mensagem de input
         String str = in.readLine();

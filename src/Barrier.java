@@ -92,6 +92,8 @@ public class Barrier {
         // Lida com caso de exceção em que se fores de rank 0 serias associado ao indice -1
         playersEntering[lobbyIndex]++;
 
+        System.out.println(gameEpoch[lobbyIndex]);
+
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] == size) {
             System.out.println("Caso 1");
@@ -110,7 +112,6 @@ public class Barrier {
             }
         } else if (playersEntering[lobbyIndex] == 1) {
             System.out.println("Caso 2");
-            playersWaiting.get(lobbyIndex).add(st);
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
             playersWaiting.get(lobbyIndex).add(st);

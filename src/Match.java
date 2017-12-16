@@ -4,7 +4,7 @@ public class Match extends Thread {
     TreeSet<ServerThread> players;
 
     Match (TreeSet<ServerThread> players) {
-        this.players = players;
+        this.players = (TreeSet<ServerThread>) players.clone();
     }
 
     public TreeSet<ServerThread> getPlayers() {
