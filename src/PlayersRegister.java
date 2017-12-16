@@ -17,6 +17,9 @@ public class PlayersRegister implements Serializable {
 
     /** Adicionar jogador à base de dados */
     public synchronized void addPlayer(Player p) {
+        if(p.isOnline()){
+            System.err.println("Ocorreu o erro de guardar um jogador com info online"); //TODO corrigir este erro (sem ser por por goOffline aqui de preferencia)
+        }
         players.put(p.getUsername(),p);
         savePlayersInfo();
     }

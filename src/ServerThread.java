@@ -96,33 +96,42 @@ public class ServerThread extends Thread implements Comparable {
     /**
      * Recebe input do utilizador e regista na base de dados
      */
-    public void registerPlayer() {
+    private void registerPlayer() {
         try {
             // Protocolo: primeira mensagem: username, segunda mensagem: password, terceira mensagem: confirmação(y ou n)
             String username = null;
             String password = null;
             boolean isRegistered = false;
             boolean repeat = true;
+            boolean skip = false;
 
 
-            while (repeat) {  //0 no caso de ser a 1a vez ou o cliente ja existir, -1 se tiver sido cancelado o processo
+            while (repeat && !skip) {
                 do {
-
-                    if(isRegistered)
-                        out.println("0"); //diz que o jogador já existia
 
                     username = in.readLine();
                     password = in.readLine();
 
                     isRegistered = allPlayers.playerExists(username);
-                } while (isRegistered);
-                out.println("1"); //diz que o jogador não existe
+                    if(isRegistered){
+                        out.println("0"); //diz que o jogador já existia
+                        skip = in.readLine().equals("-1"); //verifica se o cliente comunicou que é para avançar para login
+                    }
+                    else {
+                        out.println("1"); //avisa ainda não existia.
+                    }
+                } while (isRegistered && !skip);
 
-                repeat = in.readLine().equals("0");
+                if(!skip) { //Se saiu do ciclo sem ser por ocorrerem erros
+                    repeat = in.readLine().equals("0"); //lê se o utilizador quer tentar outra vez o registo ou não
+                }
 
                 if(!repeat) {
                     allPlayers.addPlayer(new Player(username, password));
-                    repeat = false;
+                    System.out.println("Foi registado o utilizador " + username);
+                }
+                else if (!skip) {
+                    skip = in.readLine().equals("-1");
                 }
             }
 
@@ -134,16 +143,16 @@ public class ServerThread extends Thread implements Comparable {
     /**
      * Recebe input do utilizador e verifica se está na base de dados
      */
-    public void loginPlayer() {
+    private boolean loginPlayer() {
         // Protocolo: primeira mensagem: username, segunda mensagem: password. Repetir até válido. Erro 0 se não existir, -1 se a passe estiver errada, -2 se já estiver online
         String username  = null;
         String password  = null;
-        boolean isLogged = false;
+        boolean skip = false;
         Player p = null;
         boolean check = false;
 
         try {
-            while(!check) {
+            while(!check && !skip) {
                 username = in.readLine();
                 password = in.readLine();
 
@@ -162,16 +171,25 @@ public class ServerThread extends Thread implements Comparable {
                     out.println("1");
                     check = true;
                 }
+
+                if(!check){
+                    skip = in.readLine().equals("-1");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Login funcionou: atualizar a thread para ter agora referencia ao jogador
-        player = p; //TODO: É suposto por um clone aqui ou cagamos no encapsulamento? Se for para fazer clone, vai dar trabalhinho
-        player.goOnline();
-        // Atualizar nome da thread para servir de identificador de chat
-        wrappedUsername = "[" + player.getUsername() + "]: ";
+        if(check) {
+            // Login funcionou: atualizar a thread para ter agora referencia ao jogador
+            player = p;
+            player.goOnline();
+            System.out.println("O user " + username + " está agora online!");
+            // Atualizar nome da thread para servir de identificador de chat
+            wrappedUsername = "[" + player.getUsername() + "]: ";
+        }
+
+        return check;
     }
 
     /**
@@ -223,25 +241,34 @@ public class ServerThread extends Thread implements Comparable {
      * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
     public void connectUser() throws IOException {
+        boolean toReg = true; //true se for para fazer registo false se for para fazer login
+        boolean loggedIn = false;
         boolean canPlay = false;
         String str;
         // TODO: Deixar a qualquer momento alternar entre modos (com keywords reservadas como por exemplo <REGISTER>
 
-        while (!canPlay) {
+        while (!loggedIn) {
             str = in.readLine();
 
             switch (str) {
                 case "0":
-                    registerPlayer();
-                    loginPlayer();
-                    canPlay = true;
+                    toReg = true;
                     break;
                 case "1":
-                    loginPlayer();
-                    canPlay = true;
+                    toReg = false;
                     break;
-                default:
-                    break;
+            }
+
+            while (!loggedIn) {
+                if (toReg) {
+                    registerPlayer();
+                    loggedIn = loginPlayer();
+                } else {
+                    loggedIn = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
+                    if(!loggedIn){
+                        toReg = true;
+                    }
+                }
             }
         }
     }
