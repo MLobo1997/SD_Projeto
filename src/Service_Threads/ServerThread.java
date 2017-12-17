@@ -342,6 +342,8 @@ public class ServerThread implements Comparable, Runnable {
     public void run() {
         // TODO: Lidar devidamente com exceções (fazer logoff ao jogador)
 
+
+
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
         try {
             // Deixar cliente fazer login / registo
