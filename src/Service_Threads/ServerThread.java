@@ -1,3 +1,9 @@
+package Service_Threads;
+
+import Game_Information.lobbyBarrier;
+import Game_Information.Player;
+import Game_Information.PlayerAggregator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,12 +12,12 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
- *
+/**
+ * Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  */
 public class ServerThread implements Comparable, Runnable {
     /**  ------ Connection info ----- */
-    /** Socket que liga cliente a ServerThread */
+    /** Socket que liga cliente a Service_Threads.ServerThread */
     private Socket socket;
     /** Input stream retirado da socket */
     private BufferedReader in;
@@ -19,18 +25,18 @@ public class ServerThread implements Comparable, Runnable {
     private PrintWriter out;
 
     /**  ----- Game info  ----- */
-    /**  ----- Player ----- */
+    /**  ----- Game_Information.Player ----- */
     /** Registo de todos os jogadores - recurso partilhado do servidor principal */
-    private PlayersRegister allPlayers;
+    private PlayerAggregator allPlayers;
     /** Jogador atual que a serverThread está a servir , null caso nenhum */
     private Player player;
     /** Nome do jogador em formato de prefixo chat: username -> [username]: */
     private String wrappedUsername;
-    /**  ----- Match ----- */
+    /**  ----- Service_Threads.Match ----- */
     /** Jogo atual ao qual jogador está alocado , null caso em nenhum */
     private Match currentMatch;
     /** Serviço de matchmaking, encarregue de bloquear threads até um jogo nas condições certas ser encontrado */
-    private Barrier matchmaker;
+    private lobbyBarrier matchmaker;
 
     /** Construtor de server thread, em que estabelece já os buffers de comunicação.
      *
@@ -38,7 +44,7 @@ public class ServerThread implements Comparable, Runnable {
      * @param pl Registo de todos os jogadores.
      * @param mmaker Barreira.
      */
-    public ServerThread (Socket s,PlayersRegister pl,Barrier mmaker) {
+    public ServerThread (Socket s, PlayerAggregator pl, lobbyBarrier mmaker) {
         player     = null; // Updated quando login for feito
         socket     = s;
         allPlayers = pl;
@@ -53,7 +59,7 @@ public class ServerThread implements Comparable, Runnable {
 
     /**
      * Retornar jogador associado da thread
-     * @return informação do jogador cujo cliente a ServerThread está a servir
+     * @return informação do jogador cujo cliente a Service_Threads.ServerThread está a servir
      */
     public Player getPlayer() {
         return player;
@@ -104,7 +110,6 @@ public class ServerThread implements Comparable, Runnable {
             boolean isRegistered = false;
             boolean repeat = true;
             boolean skip = false;
-
 
             while (repeat && !skip) {
                 do {
@@ -207,8 +212,8 @@ public class ServerThread implements Comparable, Runnable {
         }
     }
 
-    /** Método chamado após o login do jogador com o ituito de comunicar  com o mesmo e responder às suas decisões (como jogar, sair, etc.)
-     *
+    /**
+     * Método chamado após o login do jogador com o ituito de comunicar  com o mesmo e responder às suas decisões (como jogar, sair, etc.)
      */
     public void commandMode() {
         String cmd = null;
@@ -224,8 +229,8 @@ public class ServerThread implements Comparable, Runnable {
                     matchmaker.waitGame(this);
 
                     // Iniciar protocolo de jogo, isto acontece porque:
-                    // Possuimos um Player
-                    // Possuimos um Match
+                    // Possuimos um Game_Information.Player
+                    // Possuimos um Service_Threads.Match
                     initGame();
                 }
             } while (!cmd.equals("0"));
@@ -238,6 +243,7 @@ public class ServerThread implements Comparable, Runnable {
 
     /**
      * Protocolo de especificação de intenções do cliente pré-jogo (registar ou fazer login)
+     *
      * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
     public void connectUser() throws IOException {
@@ -274,17 +280,18 @@ public class ServerThread implements Comparable, Runnable {
     }
     /**
      * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
+     *
      * @param line
      */
     public void echoMessage(String line) {
-        for (ServerThread st : currentMatch.getPlayers()) {
+        for (ServerThread st : currentMatch.getMatchInfo().getPlayers()) {
             st.printToOutput(line);
         }
     }
 
     public void waitForGameToStart() {
 
-        int playerNum = currentMatch.getPlayerNum();
+        int playerNum = currentMatch.getMatchInfo().getPlayerNum();
 
         currentMatch.getMatchLock().lock();
 
@@ -307,6 +314,10 @@ public class ServerThread implements Comparable, Runnable {
     }
 
 
+    /**
+     * Inicializar o protocolo de comunicação para jogo. Neste método, todas as linhas lidas do jogador
+     * são interpretadas como mensagens de chat ou comandos de jogo
+     */
     public void initGame() {
 
         waitForGameToStart();
@@ -329,6 +340,7 @@ public class ServerThread implements Comparable, Runnable {
     }
 
     public void run() {
+        // TODO: Lidar devidamente com exceções (fazer logoff ao jogador)
 
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
         try {

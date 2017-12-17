@@ -1,17 +1,21 @@
+package Game_Information;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
-/** Classe utilizada para registar todos o utilizadores existentes até ao momento.
- *
+/**
+ * Classe utilizada para registar todos o utilizadores existentes até ao momento.
  */
-public class PlayersRegister implements Serializable {
-    /** Todas as contas*/
+public class PlayerAggregator implements Serializable {
+    /** Coleção de todos os jogadores registados no programa, chave é o nome do jogador */
     private HashMap<String, Player> players;
 
-    /** Construtor da classe a utilizar na primeira inicialização do servidor*/
-    public PlayersRegister(){
+    /**
+     * Construtor
+     */
+    public PlayerAggregator(){
         players = new HashMap<>();
     }
 
@@ -64,9 +68,9 @@ public class PlayersRegister implements Serializable {
         return players.containsKey(username);
     }
 
-    /** Verifica se uma instância de Player tem a password correta.
+    /** Verifica se uma instância de Game_Information.Player tem a password correta.
      *
-     * @param username Player a ser verificado.
+     * @param username Game_Information.Player a ser verificado.
      * @param pass Password a ser verificada.
      * @return Booleano de verificação.
      */

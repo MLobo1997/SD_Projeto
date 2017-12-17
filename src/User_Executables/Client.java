@@ -1,3 +1,7 @@
+package User_Executables;
+
+import Service_Threads.ClientDaemon;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -5,12 +9,18 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
-    // Connection info
+    /** Socket a ser usada para a conecção */
     private Socket socket          = null;
+    /** Scanner que lê do teclado */
     private BufferedReader scanner = null;
+    /** Inputstream gerado da socket */
     private BufferedReader is      = null;
+    /** PrintWriter gerado do socket */
     private PrintWriter os         = null;
 
+    /**
+     * Constructor
+     */
     private Client() {
         try {
             scanner = new BufferedReader(new InputStreamReader(System.in));
@@ -22,8 +32,8 @@ public class Client {
         }
     }
 
-
-    /** Faz o registo e/ou login de um utilizador ao sistema.
+    /**
+     * Faz o registo e/ou login de um utilizador ao sistema.
      *
      * @return Informação do jogador.
      */
@@ -64,7 +74,8 @@ public class Client {
         }
     }
 
-    /** Verifica se num registo é para avançar para o login e comunica essa decisão para o servidor.
+    /**
+     * Verifica se num registo é para avançar para o login e comunica essa decisão para o servidor.
      *
      * @return Booleano com resultado, true se for para avançar.
      * @throws IOException
@@ -92,8 +103,8 @@ public class Client {
         return skip;
     }
 
-    /** Faz o registo de um jogador no sistema.
-     *
+    /**
+     * Faz o registo de um jogador no sistema.
      */
     private void registerPlayer() {
         String username = null , password, tmp;
@@ -152,7 +163,8 @@ public class Client {
         }
     }
 
-    /** Faz o login dum cliente no sistema.
+    /**
+     * Faz o login dum cliente no sistema.
      *
      * @return Informação do cliente.
      */
@@ -200,8 +212,8 @@ public class Client {
         return check;
     }
 
-    /** Desconecta o utilizador localmente.
-     *
+    /**
+     * Desconecta o utilizador localmente.
      */
     private void disconnectUser (){
         System.out.println("Desligando do sistema.");
@@ -245,7 +257,8 @@ public class Client {
         }
     }
 
-    /** Inicia o menu do jogo após o login e permite ao jogador escolher o que quer fazer a seguir (e.g.: jogar, sair do programa, outras cenas que podemos inventar)
+    /**
+     * Inicia o menu do jogo após o login e permite ao jogador escolher o que quer fazer a seguir (e.g.: jogar, sair do programa, outras cenas que podemos inventar)
      *
      * @return Valor que identifica a opção do jogador (-1 -> ocorreu um erro ; 0 -> desistir; 1 -> jogar)
      */
@@ -279,8 +292,8 @@ public class Client {
         return -1; //Se chegar aqui é porque algo correu mal.
     }
 
-    /** Método que faz o processamento após o login.
-     *
+    /**
+     * Método que faz o processamento após o login.
      */
     private void init(){
         Thread t = new Thread(new ClientDaemon(socket));
@@ -303,7 +316,7 @@ public class Client {
 
         Client client = new Client();
 
-        client.connectUser(); //TODO: Justifica-se colocar Player?
+        client.connectUser(); //TODO: Justifica-se colocar Game_Information.Player?
 
         client.init();
     }

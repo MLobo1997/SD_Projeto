@@ -1,18 +1,14 @@
+package Service_Threads;
+
+import Game_Information.MatchInfo;
+
 import java.util.TreeSet;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Match implements Runnable {
     /** ------ Informação de jogo */
-    /** Conjunto dos serverThreads dos jogadores incluidos neste jogo */
-    private TreeSet<ServerThread> players;
-    /** Escolhas de herois da equipa 1 */
-    private pickedHeroes picksTeamOne;
-    /** Escolhas de herois da equipa 2 */
-    private pickedHeroes picksTeamTwo;
-    /** Número de jogadores */
-    private int size;
-
+    private MatchInfo matchInfo;
     /** ------ Controlo de concorrência */
     /** Contador de quantas threads já foram acordadas */
     private int threadsAwoken;
@@ -21,48 +17,66 @@ public class Match implements Runnable {
     /** Condição: Já todas as threads dos jogadores estão acordadas? */
     private Condition allPlayersReady;
 
-    Match (TreeSet<ServerThread> players,int size,ReentrantLock matchLock) {
+    /**
+     * Construtor
+     * @param players Lista de jogadores a ingressar no jogo
+     * @param size Número de jogadores (TODO: Sacar só players.size()?
+     * @param matchLock Lock único para cada match
+     */
+    public Match (TreeSet<ServerThread> players,int size,ReentrantLock matchLock) {
         /** Clonar para não ficar com serverThreads de outro jogo quando for modificado */
-        this.players = (TreeSet<ServerThread>) players.clone();
-        this.size = size;
+        matchInfo = new MatchInfo(players,size);
         this.matchLock = matchLock;
         allPlayersReady = this.matchLock.newCondition();
         threadsAwoken = 0;
     }
 
-    public pickedHeroes getPicksTeamOne() {
-        return picksTeamOne;
-    }
-
-    public pickedHeroes getPicksTeamTwo() {
-        return picksTeamTwo;
-    }
-
+    /**
+     * Getter de threads acordadas
+     *
+     * @return Número de threads acordadas
+     */
     public int getThreadsAwoken() {
         return threadsAwoken;
     }
 
+    /**
+     * Getter de lock do jogo
+     *
+     * @return Lock do jogo
+     */
     public ReentrantLock getMatchLock() {
         return matchLock;
     }
 
+    /**
+     * Getter da condição de espera
+     *
+     * @return Condição de espera
+     */
     public Condition getAllPlayersReadyCondition() {
         return allPlayersReady;
     }
 
+    /**
+     * Getter de informação do jogo
+     *
+     * @return Agregador de toda a informação importante do jogo associado
+     */
+    public MatchInfo getMatchInfo() { return matchInfo; }
+
+    /**
+     * Incrementa o número de threads prontas a jogar
+     */
     public void incrementPlayersReady() {
         threadsAwoken++;
     }
 
-    public int getPlayerNum() {
-        return size;
-    }
-
-
-    public TreeSet<ServerThread> getPlayers() {
-        return players;
-    }
-
+    /**
+     * Esperar durante um certo tempo
+     *
+     * @param secs tempo a esperar
+     */
     public void waitFor (int secs) {
         try {
             Thread.sleep(secs * 1000);
@@ -71,20 +85,23 @@ public class Match implements Runnable {
         }
     }
 
+    /**
+     * Escrever no PrintWriter de todos os jogadores associados ao jogo (para implementar funcionalidades de chat p.e.)
+     * @param line Linha a ser escrita em broadcast
+     */
     public void printBroadcast(String line) {
-        for (ServerThread st : players) {
+        for (ServerThread st : matchInfo.getPlayers()) {
             st.printToOutput(line);
         }
     }
 
+    /**
+     * Esperar até todos os jogadores estarem prontos (previne o alarme começar antes de toda a gente estar pronta)
+     */
     public void waitForGameToStart() {
-        printBroadcast("WAIT DO MATCH");
-
-
         matchLock.lock();
 
-
-        while (threadsAwoken != size) {
+        while (threadsAwoken != matchInfo.getPlayerNum()) {
             try {
                 allPlayersReady.await();
             } catch (InterruptedException e) {
@@ -111,27 +128,5 @@ public class Match implements Runnable {
 
     }
 
-    public class pickedHeroes {
-        /** Associar a cada indice um jogador, onde escreve um nr de 1 a 30 (representa os herois) */
-        private int[] escolhas;
-        private int size;
-
-        public pickedHeroes() {
-            escolhas = new int[size]; // TODO: MUDAR ESTA VARIAVEL TEMPORARIA
-            size = 2;
-        }
-
-        synchronized public boolean chooseHero(int indexJogador,int indexHeroi) {
-            for (int i = 0; i < size; i++) {
-                if (escolhas[i] == indexHeroi) {
-                    return false;
-                }
-            }
-
-            escolhas[indexJogador] = indexHeroi;
-
-            return true;
-        }
-    }
 
 }

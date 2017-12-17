@@ -1,3 +1,5 @@
+package Game_Information;
+
 import java.io.Serializable;
 
 /**
@@ -15,7 +17,7 @@ public class Player implements Serializable, Cloneable {
     /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
     private boolean online;
 
-    /** Método de contrução do objeto Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
+    /** Método de contrução do objeto Game_Information.Player, utilizando quando um utilizador é inserido pela primeira vez no sistema.
      *
      * @param name Nome do utilizador.
      * @param password Passe de acesso.
@@ -28,7 +30,8 @@ public class Player implements Serializable, Cloneable {
         ranking       = 0.0;
     }
 
-    /** Construtor por cópia.
+    /**
+     * Construtor
      *
      * @param p Instância de jogador a ser copiada.
      */
@@ -38,9 +41,6 @@ public class Player implements Serializable, Cloneable {
         this.online = p.online;
         this.nrOfGames = p.nrOfGames;
         this.ranking = p.ranking;
-    }
-
-    public static void main(String [] args){
     }
 
     /** Getter do username do jogador.
@@ -102,7 +102,6 @@ public class Player implements Serializable, Cloneable {
         else{
             throw new IllegalArgumentException("A função addGame foi evocada com um valor inferior a 0 ou superior a 9");
         }
-
     }
 
     /**Verifica se as passes entre as duas instâncias de jogador correspondem.
@@ -128,7 +127,7 @@ public class Player implements Serializable, Cloneable {
      */
     @Override
     public String toString() {
-        return "Player{" +
+        return "Game_Information.Player{" +
                 ", name='" + name + '\'' +
                 ", nrOfGames=" + nrOfGames +
                 ", ranking=" + ranking +

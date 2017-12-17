@@ -1,3 +1,5 @@
+package Simulation;
+
 import com.opencsv.CSVReader;
 
 import java.io.BufferedReader;
@@ -8,8 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
-/** Classe do programa que gera clientes que atuam aleatóriamente para fins de teste do servidor.
- *
+/**
+ * Classe do programa que gera clientes que atuam aleatóriamente para fins de teste do servidor.
  */
 public class ClientGenerator {
     /** Número de bots a clientes a serem gerados. */
@@ -19,8 +21,8 @@ public class ClientGenerator {
     /** Conjunto de threads dos clientes a ser corridos, mapeadas pelos usernames dos respetivos clientes.*/
     private HashSet<Thread> clients;
 
-    /** Construtor da classe ClientGenerator.
-     *
+    /**
+     * Construtor da classe Simulation.ClientGenerator.
      */
     private ClientGenerator(){
         scanner = new BufferedReader(new InputStreamReader(System.in));
@@ -29,7 +31,8 @@ public class ClientGenerator {
         runClients(loadPlayersInfo());
     }
 
-    /** Corre todos os clientes cuja informação de jogadores se encontra no map.
+    /**
+     * Corre todos os clientes cuja informação de jogadores se encontra no map.
      *
      * @param players Map de informação de jogadores.
      */
@@ -38,7 +41,8 @@ public class ClientGenerator {
     }
 
 
-    /** Cria e corre uma thread de cliente.
+    /**
+     * Cria e corre uma thread de cliente.
      *
      * @param user Username do jogador.
      * @param pass Password do jogador.
@@ -50,7 +54,8 @@ public class ClientGenerator {
         t.run();
     }
 
-    /** Método utilizado para fazer parse da informação dos jogadores guardada num ficheiro csv.
+    /**
+     * Método utilizado para fazer parse da informação dos jogadores guardada num ficheiro csv.
      *
      * @return Inicialização da variável players.
      */
@@ -73,7 +78,8 @@ public class ClientGenerator {
         return r;
     }
 
-    /** Método de inicialização da variável N, questionando ao utilizador qual o seu valor.
+    /**
+     * Método de inicialização da variável N, questionando ao utilizador qual o seu valor.
      *
      * @return N.
      */

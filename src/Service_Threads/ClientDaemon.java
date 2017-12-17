@@ -1,17 +1,24 @@
+package Service_Threads;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/** Classe utilizada para a thread de Cliente que funciona como um listener dos dados que lhe são enviados
- *
+/**
+ * Classe utilizada para a thread de Cliente que funciona como um listener dos dados que lhe são enviados
+ * e re-direciona para o terminal do utilizador
  */
 public class ClientDaemon implements Runnable {
     private BufferedReader is = null;
     private PrintWriter os = null;
     private Socket socket = null;
 
+    /**
+     * Constructor
+     * @param s Socket que o cliente utiliza para comunicar com o servidor
+     */
     public ClientDaemon(Socket s) {
         this.socket = s;
 
