@@ -1,5 +1,6 @@
 package Service_Threads;
 
+import Game_Information.MessageBuffer;
 import Game_Information.lobbyBarrier;
 import Game_Information.Player;
 import Game_Information.PlayerAggregator;
@@ -11,11 +12,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  */
-public class ServerThread implements Comparable, Runnable {
+public class ServerThread implements Comparable, Runnable, Observer {
     /**  ------ Connection info ----- */
     /** Socket que liga cliente a Service_Threads.ServerThread */
     private Socket socket;
@@ -37,6 +40,8 @@ public class ServerThread implements Comparable, Runnable {
     private Match currentMatch;
     /** Serviço de matchmaking, encarregue de bloquear threads até um jogo nas condições certas ser encontrado */
     private lobbyBarrier matchmaker;
+    /** Lista de mensagens que têm de ser enviadas para o cliente */
+    private MessageBuffer messageBuffer;
 
     /** Construtor de server thread, em que estabelece já os buffers de comunicação.
      *
@@ -45,10 +50,13 @@ public class ServerThread implements Comparable, Runnable {
      * @param mmaker Barreira.
      */
     public ServerThread (Socket s, PlayerAggregator pl, lobbyBarrier mmaker) {
-        player     = null; // Updated quando login for feito
-        socket     = s;
-        allPlayers = pl;
-        matchmaker = mmaker;
+        player        = null; // Updated quando login for feito
+        socket        = s;
+        allPlayers    = pl;
+        matchmaker    = mmaker;
+        messageBuffer = new MessageBuffer();
+        messageBuffer.addObserver(this); // Quando houver uma mensagem nova, avisa-me para enviar ao cliente
+
         try {
             in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(),true);
@@ -63,6 +71,10 @@ public class ServerThread implements Comparable, Runnable {
      */
     public Player getPlayer() {
         return player;
+    }
+
+    public MessageBuffer getMessageBuffer() {
+        return messageBuffer;
     }
 
     /**
@@ -278,17 +290,23 @@ public class ServerThread implements Comparable, Runnable {
             }
         }
     }
+
     /**
-     * Enviar mensagem para toda a gente no jogo em que o jogador que a thread serve está (implementação de chat)
+     * Enviar mensagem para todos as threads a servir o cliente. Não é enviado diretamente para o cliente, mas para
+     * o buffer da thread. Esta estará encarregue de esvaziar o buffer e enviar as mensagens para o cliente.
      *
      * @param line
      */
     public void echoMessage(String line) {
         for (ServerThread st : currentMatch.getMatchInfo().getPlayers()) {
-            st.printToOutput(line);
+            st.getMessageBuffer().publishMessage(line);
         }
     }
 
+    /**
+     * Antes de inicilizar o protocolo de jogo, é necessário esperar primeiro que as restantes 9 threads
+     * estejam prontas a jogar, este método bloqueia a thread até isso acontecer.
+     */
     public void waitForGameToStart() {
 
         int playerNum = currentMatch.getMatchInfo().getPlayerNum();
@@ -312,7 +330,6 @@ public class ServerThread implements Comparable, Runnable {
         currentMatch.getMatchLock().unlock();
 
     }
-
 
     /**
      * Inicializar o protocolo de comunicação para jogo. Neste método, todas as linhas lidas do jogador
@@ -342,8 +359,6 @@ public class ServerThread implements Comparable, Runnable {
     public void run() {
         // TODO: Lidar devidamente com exceções (fazer logoff ao jogador)
 
-
-
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
         try {
             // Deixar cliente fazer login / registo
@@ -365,5 +380,19 @@ public class ServerThread implements Comparable, Runnable {
         } else {
             return difference;
         }
+    }
+
+    @Override
+    /**
+     * Quando for notificado, sabe que há mensagens novas no messageBuffer para enviar para o cliente.
+     */
+    public void update(Observable o, Object arg) {
+
+        String line;
+
+        while((line = messageBuffer.getMessage()) != null) {
+            out.println(line);
+        }
+
     }
 }

@@ -86,12 +86,14 @@ public class Match implements Runnable {
     }
 
     /**
-     * Escrever no PrintWriter de todos os jogadores associados ao jogo (para implementar funcionalidades de chat p.e.)
+     * Atualizar o buffer das threads que servem os jogadores associados ao jogo
+     * (para implementar funcionalidades de chat p.e.)
+     *
      * @param line Linha a ser escrita em broadcast
      */
-    public void printBroadcast(String line) {
+    public void echoMessage(String line) {
         for (ServerThread st : matchInfo.getPlayers()) {
-            st.printToOutput(line);
+            st.getMessageBuffer().publishMessage(line);
         }
     }
 
@@ -116,15 +118,15 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
-        printBroadcast("Welcome to the match!");
+        echoMessage("Welcome to the match!");
 
         for (int i = 0; i < 2; i++) {
-            printBroadcast(i * 5 + " seconds passed.");
+            echoMessage(i * 5 + " seconds passed.");
             waitFor(5);
         }
 
-        printBroadcast("$GAMEOVER$");
-        printBroadcast("Game is over");
+        echoMessage("$GAMEOVER$");
+        echoMessage("Game is over");
 
     }
 

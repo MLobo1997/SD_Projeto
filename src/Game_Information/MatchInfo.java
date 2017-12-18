@@ -8,6 +8,7 @@ import java.util.TreeSet;
  * Informação relativa a um certo jogo
  */
 public class MatchInfo {
+    private TreeSet<MessageBuffer> messageBuffers;
     /** Conjunto dos serverThreads dos jogadores incluidos neste jogo */
     private TreeSet<ServerThread> players;
     /** Escolhas de herois da equipa 1 */
@@ -23,6 +24,7 @@ public class MatchInfo {
      * @param size Número de jogadores ( TODO: Sacar players.size() ao invés? )
      */
     public MatchInfo(TreeSet<ServerThread> players,int size) {
+        this.messageBuffers = messageBuffers;
         this.players = players;
         this.playerNum = size;
     }
@@ -61,5 +63,4 @@ public class MatchInfo {
     public TreeSet<ServerThread> getPlayers() {
         return players;
     }
-
 }
