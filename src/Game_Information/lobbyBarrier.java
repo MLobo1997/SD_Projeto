@@ -127,7 +127,7 @@ public class lobbyBarrier {
                 conditionLobbiesAvailable[lobbyIndex].await();
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            st.cleanup();
         }
 
         lockLobbies[lobbyIndex].unlock();

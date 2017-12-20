@@ -1,8 +1,6 @@
 package Game_Information;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -15,8 +13,8 @@ public class PlayerAggregator implements Serializable {
     /**
      * Construtor
      */
-    public PlayerAggregator(){
-        players = new HashMap<>();
+    public PlayerAggregator(String file){
+        players = loadPlayers(file);
     }
 
     /** Adicionar jogador à base de dados */
@@ -57,6 +55,26 @@ public class PlayerAggregator implements Serializable {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Carrega da base de dados a lista de utilizadores que se encontra na diretoria de trabalho
+     *
+     * @return O registo de jogadores guardados se existir, senão retorna um completamente novo
+     */
+    public HashMap<String,Player> loadPlayers(String file) {
+        if (new File("../../" + file).exists()) {
+            try {
+                FileInputStream saveFile = new FileInputStream("players.sav");
+                ObjectInputStream save = new ObjectInputStream(saveFile);
+                return (((PlayerAggregator) save.readObject()).players);
+
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return new HashMap<String,Player>();
     }
 
     /**

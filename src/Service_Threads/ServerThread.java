@@ -152,8 +152,9 @@ public class ServerThread implements Comparable, Runnable, Observer {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             System.out.println("Client left");
+            cleanup();
         }
     }
 
@@ -193,8 +194,9 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     skip = in.readLine().equals("-1");
                 }
             }
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             e.printStackTrace();
+            cleanup();
         }
 
         if(check) {
@@ -248,8 +250,8 @@ public class ServerThread implements Comparable, Runnable, Observer {
             } while (!cmd.equals("0"));
             cleanup();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (NullPointerException | IOException e) {
+            cleanup();
         }
     }
 
@@ -258,15 +260,20 @@ public class ServerThread implements Comparable, Runnable, Observer {
      *
      * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
-    public void connectUser() throws IOException {
+    public void connectUser() {
         boolean toReg = true; //true se for para fazer registo false se for para fazer login
         boolean loggedIn = false;
         boolean canPlay = false;
-        String str;
+        String str = null;
         // TODO: Deixar a qualquer momento alternar entre modos (com keywords reservadas como por exemplo <REGISTER>
 
         while (!loggedIn) {
-            str = in.readLine();
+            try {
+                str = in.readLine();
+            } catch (IOException | NullPointerException e) {
+                e.printStackTrace();
+                cleanup();
+            }
 
             switch (str) {
                 case "0":
@@ -340,11 +347,11 @@ public class ServerThread implements Comparable, Runnable, Observer {
         waitForGameToStart();
 
         try {
-        // Mensagem de input
-        String str = in.readLine();
+            // Mensagem de input
+            String str = in.readLine();
 
-        // Timestamp de quando a mensagem foi enviada
-        String timestamp;
+            // Timestamp de quando a mensagem foi enviada
+            String timestamp;
             while(!(str.equals("quit") || str.equals("$GAMEOVER$"))) {
                 timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
                 echoMessage(timestamp + wrappedUsername + str);
@@ -360,16 +367,12 @@ public class ServerThread implements Comparable, Runnable, Observer {
         // TODO: Lidar devidamente com exceções (fazer logoff ao jogador)
 
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
-        try {
-            // Deixar cliente fazer login / registo
-            connectUser();
 
-            // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
-            commandMode();
+        // Deixar cliente fazer login / registo
+        connectUser();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
+        commandMode();
     }
 
     @Override
