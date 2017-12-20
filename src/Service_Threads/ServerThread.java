@@ -82,7 +82,11 @@ public class ServerThread implements Comparable, Runnable, Observer {
      */
     public void cleanup() {
         try {
-            System.out.println(player.getUsername() + " a ser desconectado");
+            if (player != null) {
+                System.out.println(player.getUsername() + " a ser desconectado");
+            } else {
+                System.out.println("Cliente desconectado");
+            }
 
             in.close();
             out.close();
@@ -93,6 +97,9 @@ public class ServerThread implements Comparable, Runnable, Observer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        allPlayers.savePlayersInfo();
+        Thread.currentThread().stop();
     }
 
     /**
@@ -275,6 +282,10 @@ public class ServerThread implements Comparable, Runnable, Observer {
                 cleanup();
             }
 
+            if (str == null) {
+                cleanup();
+            }
+
             switch (str) {
                 case "0":
                     toReg = true;
@@ -314,7 +325,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
      * Antes de inicilizar o protocolo de jogo, é necessário esperar primeiro que as restantes 9 threads
      * estejam prontas a jogar, este método bloqueia a thread até isso acontecer.
      */
-    public void waitForGameToStart() {
+    public void signalReady() {
 
         int playerNum = currentMatch.getMatchInfo().getPlayerNum();
 
@@ -324,14 +335,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
 
         if  (currentMatch.getThreadsAwoken() == playerNum) {
             currentMatch.getAllPlayersReadyCondition().signal();
-        }
-
-        while (currentMatch.getThreadsAwoken() != playerNum) {
-            try {
-                currentMatch.getAllPlayersReadyCondition().await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
         currentMatch.getMatchLock().unlock();
@@ -344,7 +347,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
      */
     public void initGame() {
 
-        waitForGameToStart();
+        signalReady();
 
         try {
             // Mensagem de input

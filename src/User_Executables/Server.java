@@ -6,7 +6,6 @@ import Service_Threads.ServerThread;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Observable;
 
 /**
  * A classe principal do servidor.
@@ -54,6 +53,7 @@ public class Server {
         // TODO: Monitor de servidor (para permitir sair seguramente e só aí guardar registos)
         try {
             Server s = new Server();
+            System.out.println(s.allPlayers.getPlayers());
             s.runServer();
         } catch (IOException e) {
             e.printStackTrace();

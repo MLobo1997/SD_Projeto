@@ -17,6 +17,10 @@ public class PlayerAggregator implements Serializable {
         players = loadPlayers(file);
     }
 
+    public HashMap<String,Player> getPlayers() {
+        return players;
+    }
+
     /** Adicionar jogador à base de dados */
     public synchronized void addPlayer(Player p) {
         if(p.isOnline()){
@@ -48,7 +52,7 @@ public class PlayerAggregator implements Serializable {
      */
     public void savePlayersInfo() {
         try  {
-            FileOutputStream saveFile = new FileOutputStream("players.sav");
+            FileOutputStream saveFile = new FileOutputStream("../../players.sav");
             try (ObjectOutputStream save = new ObjectOutputStream(saveFile)) {
                 save.writeObject(this);
             }
@@ -66,7 +70,7 @@ public class PlayerAggregator implements Serializable {
     public HashMap<String,Player> loadPlayers(String file) {
         if (new File("../../" + file).exists()) {
             try {
-                FileInputStream saveFile = new FileInputStream("players.sav");
+                FileInputStream saveFile = new FileInputStream("../../" + file);
                 ObjectInputStream save = new ObjectInputStream(saveFile);
                 return (((PlayerAggregator) save.readObject()).players);
 
