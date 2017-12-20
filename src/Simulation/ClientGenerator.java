@@ -18,7 +18,7 @@ public class ClientGenerator {
     private Integer N;
     /** Variável para permitir fazer reads de input mais facilmente*/
     private BufferedReader scanner;
-    /** Conjunto de threads dos clientes a ser corridos, mapeadas pelos usernames dos respetivos clientes.*/
+    /** Conjunto de threads dos clientes a ser corridos*/
     private HashSet<Thread> clients;
 
     /**

@@ -380,7 +380,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
 
     @Override
     public int compareTo(Object o) {
-        int difference = (int) (player.getRanking() - ((ServerThread) o).player.getRanking());
+        int difference = (int) (player.getRank() - ((ServerThread) o).player.getRank());
         if (difference == 0) {
             return 1; // Para permitir chaves iguais
         } else {

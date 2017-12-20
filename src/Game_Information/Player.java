@@ -1,5 +1,7 @@
 package Game_Information;
 
+import Exceptions.LevelUpException;
+
 import java.io.Serializable;
 
 /**
@@ -10,10 +12,21 @@ public class Player implements Serializable, Cloneable {
     private String name;
     /** Passe de acesso do utilizador. */
     private String password;
-    /** Número de jogos feitos até agora */
-    private Integer nrOfGames;
-    /** Ranking médio do jogador, valor entre 0 e 9, derivado da média de classificações de todos os seus jogos já feitos. */
-    private Double ranking;
+    /** Rank do jogador, valor entre 0 e 9, derivado da soma das classificações de todos os seus jogos já feitos.
+     * Rank = 0 -> xp =  [0 , 9[
+     * Rank = 1 -> xp =  [9 , 27[
+     * Rank = 2 -> xp =  [27 , 54[
+     * Rank = 3 -> xp =  [54 , 90[
+     * Rank = 4 -> xp =  [90 , 135[
+     * Rank = 5 -> xp =  [135 , 189[
+     * Rank = 6 -> xp =  [189 , 252[
+     * Rank = 7 -> xp =  [252 , 324[
+     * Rank = 8 -> xp =  [324 , 405[
+     * Rank = 9 -> xp >= 405
+     */
+    private Integer rank;
+    /** Experience points do jogador, utilizados para contabilizar a soma de todas as classificações obtidas pelo jogador, o que determina o rank. */
+    private Integer xp;
     /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
     private boolean online;
 
@@ -26,8 +39,8 @@ public class Player implements Serializable, Cloneable {
         this.name     = name;
         this.password = password;
         online        = false;
-        nrOfGames     = 0;
-        ranking       = 0.0;
+        rank          = 0;
+        xp            = 0;
     }
 
     /**
@@ -39,8 +52,7 @@ public class Player implements Serializable, Cloneable {
         this.name = p.name;
         this.password = p.password;
         this.online = p.online;
-        this.nrOfGames = p.nrOfGames;
-        this.ranking = p.ranking;
+        this.rank = p.rank;
     }
 
     /** Getter do username do jogador.
@@ -55,16 +67,12 @@ public class Player implements Serializable, Cloneable {
      */
     private String getPassword() { return password; }
 
-    /** Getter do ranking médio do jogador
+    /** Getter do rank do jogador
      *
-     * @return Ranking
+     * @return rank
      */
-    public Double getRanking() {
-        return ranking;
-    }
-
-    public void setRank(double rank) {
-        this.ranking = rank;
+    public Integer getRank() {
+        return rank;
     }
 
     /**
@@ -88,19 +96,37 @@ public class Player implements Serializable, Cloneable {
         return online;
     }
 
-    /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o ranking geral do mesmo.
+    /** Adiciona um valor de ranking ao histórico de jogos do utilizador, atualizando o rank do mesmo.
      *
-     * @param rank Rank do jogo.
+     * @param gameRank Rank do jogo (0-9).
      * @throws IllegalArgumentException Exceção de ter sido dado como argumento um valor não contido em [0, 9].
      */
-    public void addGame(Integer rank) throws IllegalArgumentException{
-        // TODO: Atualizar como é feita a atualização dos ranks
-        if(rank >= 0 && rank <= 9) {
-            ranking = (ranking * nrOfGames + rank) / ((double) nrOfGames + 1);
-            nrOfGames++;
+    public void addGame(Integer gameRank) throws IllegalArgumentException, LevelUpException{
+
+        if(gameRank >= 0 && gameRank <= 9) {
+            xp += gameRank;
+            updateRank();
         }
         else{
             throw new IllegalArgumentException("A função addGame foi evocada com um valor inferior a 0 ou superior a 9");
+        }
+    }
+
+    /** Verifica se um jogador já tem xp suficiente para avançar para o rank suficiente e, se sim, promove-o.
+     *
+     */
+    private void updateRank () throws LevelUpException{
+        int xpMin = 0;
+
+        if (rank < 9) {
+            for (int i = 0; i <= rank + 1; i++) {
+                xpMin += 9 * i;                       //Este sumatório identifica o xp mínimo do rank seguinte
+            }
+
+            if (xp >= xpMin) {
+                rank++;
+                throw new LevelUpException(rank);
+            }
         }
     }
 
@@ -127,10 +153,12 @@ public class Player implements Serializable, Cloneable {
      */
     @Override
     public String toString() {
-        return "Game_Information.Player{" +
-                ", name='" + name + '\'' +
-                ", nrOfGames=" + nrOfGames +
-                ", ranking=" + ranking +
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", rank=" + rank +
+                ", xp=" + xp +
+                ", online=" + online +
                 '}';
     }
 }

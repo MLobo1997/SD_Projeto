@@ -90,7 +90,7 @@ public class lobbyBarrier {
         Player player = st.getPlayer();
 
         // Usado para determinar para qual dos lobbies jogador irá
-        int rankCap = (int) Math.ceil(player.getRanking());
+        int rankCap = (int) Math.ceil(player.getRank());
 
         // Como jogador irá para o indice rankJogador - 1, lidar com o caso de excessão rank = 0;
         int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1);
