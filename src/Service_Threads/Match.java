@@ -24,7 +24,7 @@ public class Match implements Runnable {
      * @param matchLock Lock único para cada match
      */
     public Match (TreeSet<ServerThread> players,int size,ReentrantLock matchLock) {
-        /** Clonar para não ficar com serverThreads de outro jogo quando for modificado */
+        /* Clonar para não ficar com serverThreads de outro jogo quando for modificado */
         matchInfo = new MatchInfo(players,size);
         this.matchLock = matchLock;
         allPlayersReady = this.matchLock.newCondition();

@@ -244,7 +244,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
             do {
                 cmd = in.readLine();
 
-                if (cmd.equals("1")){
+                if (cmd.equals("1")){ //O jogador que jogar
                     System.out.println(player.getUsername() + " wants to play a game");
                     // Procurar jogo e ficar inoperável até encontrar
                     matchmaker.waitGame(this);
@@ -254,7 +254,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     // Possuimos um Service_Threads.Match
                     initGame();
                 }
-            } while (!cmd.equals("0"));
+            } while (!cmd.equals("0")); // cmd = 0 quando quer fazer logout
             cleanup();
 
         } catch (NullPointerException | IOException e) {
@@ -313,7 +313,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
      * Enviar mensagem para todos as threads a servir o cliente. Não é enviado diretamente para o cliente, mas para
      * o buffer da thread. Esta estará encarregue de esvaziar o buffer e enviar as mensagens para o cliente.
      *
-     * @param line
+     * @param line Mensagem a ser enviada.
      */
     public void echoMessage(String line) {
         for (ServerThread st : currentMatch.getMatchInfo().getPlayers()) {
@@ -322,7 +322,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
     }
 
     /**
-     * Antes de inicilizar o protocolo de jogo, é necessário esperar primeiro que as restantes 9 threads
+     * Antes de inicializar o protocolo de jogo, é necessário esperar primeiro que as restantes 9 threads
      * estejam prontas a jogar, este método bloqueia a thread até isso acontecer.
      */
     public void signalReady() {
@@ -388,10 +388,10 @@ public class ServerThread implements Comparable, Runnable, Observer {
         }
     }
 
-    @Override
     /**
      * Quando for notificado, sabe que há mensagens novas no messageBuffer para enviar para o cliente.
      */
+    @Override
     public void update(Observable o, Object arg) {
 
         String line;

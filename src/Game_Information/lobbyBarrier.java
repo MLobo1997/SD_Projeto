@@ -19,12 +19,12 @@ public class lobbyBarrier {
     private List<TreeSet<ServerThread>> playersWaiting;
     /** Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
     private int[] playersEntering;
-    /** Época atual do jogo */
+    /** Época atual do jogo */ //TODO explicar melhor isto que o lobo não percebe
     private int[] gameEpoch;
     /** Número de ranks */
-    private int rankNum;
+    private static final int rankNum = 10;
     /** Número de jogadores por jogo.*/
-    private int size;
+    private static final int size = 2; // TODO: Valor temporário, mudar
     /** Coleção de threads dedicadas a jogadores.*/
     private HashSet<ServerThread> players;
     /** Lock associado à condição do lobby i */
@@ -37,12 +37,11 @@ public class lobbyBarrier {
      * Construtor
      */
     public lobbyBarrier() {
-        size = 2; // TODO: Valor temporário, mudar
-        rankNum = 10;
         playersEntering = new int[size];
 
-        /** indice 0: Pessoas de rank 0
-         * indice 1: Pessoas de rank 0 até 1 */
+        /* indice 0: Pessoas de rank 0
+         * indice 1: Pessoas de rank 1
+         * etc*/
         playersWaiting = new ArrayList<>();
 
         lockLobbies = new ReentrantLock[rankNum];
@@ -81,55 +80,68 @@ public class lobbyBarrier {
     }
 
     /**
-     * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar
+     * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar //TODO este método atualmente faz mt mais que isto
      * @param st thread que presta serviços ao cliente
      */
     public void waitGame(ServerThread st) {
-        System.out.println("Entrou " +  st.getPlayer().getUsername());
-        // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
-        Player player = st.getPlayer();
+            System.out.println("Entrou para a lista de espera o jogador: " + st.getPlayer().getUsername());
+            // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
+            Player player = st.getPlayer();
 
-        // Usado para determinar para qual dos lobbies jogador irá
-        int rankCap = (int) Math.ceil(player.getRank());
-
-        // Como jogador irá para o indice rankJogador - 1, lidar com o caso de excessão rank = 0;
-        int lobbyIndex = (rankCap == 0) ? 0 : (rankCap - 1);
-
-        // Lock acedido quando são escritas variáveis partilhadas
-        lockLobbies[lobbyIndex].lock();
-
-        // Em que instância de um certo lobby vou estar?
-        int myEpoch = gameEpoch[lobbyIndex];
-
-        // Lida com caso de exceção em que se fores de rank 0 serias associado ao indice -1
-        playersEntering[lobbyIndex]++;
-
-        // Já posso começar o jogo?
-        if (playersEntering[lobbyIndex] == size) {
-            playersWaiting.get(lobbyIndex).add(st);
-            Match match = new Match((TreeSet<ServerThread>)playersWaiting.get(lobbyIndex).clone(),size,new ReentrantLock());
-            informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
-            new Thread(match).start();
-            gameEpoch[lobbyIndex]++;
-            conditionLobbiesAvailable[lobbyIndex].signal();
-            playersEntering[lobbyIndex] = 0;
-
-        } else if (playersEntering[lobbyIndex] == 1) {
-            // só um jogador novo, re-iniciar lista de espera
-            playersWaiting.get(lobbyIndex).clear();
-            playersWaiting.get(lobbyIndex).add(st);
-        }
-
-        printPlayersInLobby(playersWaiting.get(lobbyIndex));
+            int lobbyIndex = player.getRank();
 
         try {
-            while (myEpoch == gameEpoch[lobbyIndex]) {
-                conditionLobbiesAvailable[lobbyIndex].await();
-            }
-        } catch (InterruptedException e) {
-            st.cleanup();
-        }
+            // Lock acedido quando são escritas variáveis partilhadas
+            lockLobbies[lobbyIndex].lock();
 
-        lockLobbies[lobbyIndex].unlock();
+            // Em que instância de um certo lobby vou estar?
+            int myEpoch = gameEpoch[lobbyIndex];
+
+            //Anuncia que entrou mais um jogador
+            playersEntering[lobbyIndex]++; //TODO: Como se vai mudar a implementação para ir buscar também aos vizinhos
+
+            // Já posso começar o jogo?
+            if (playersEntering[lobbyIndex] == size) {  //TODO: Colocar isto tudo dentro de uma função e com comentários a explicar
+                startMatch(st);
+            }
+
+            else if (playersEntering[lobbyIndex] == 1) { //TODO Porque não fazer isto no final de startMatch e evitar este else if?
+                // só um jogador novo, re-iniciar lista de espera
+                playersWaiting.get(lobbyIndex).clear();
+                playersWaiting.get(lobbyIndex).add(st);
+            }
+
+            printPlayersInLobby(playersWaiting.get(lobbyIndex));
+
+            try {
+                while (myEpoch == gameEpoch[lobbyIndex]) {
+                    conditionLobbiesAvailable[lobbyIndex].await();
+                }
+            } catch (InterruptedException e) {
+                st.cleanup();
+            }
+
+        }
+        finally {
+            lockLobbies[lobbyIndex].unlock(); //TODO: Talvez seja necessario mudar isto para antes do condition await?
+        }
+    }
+
+    private void startMatch(ServerThread st){
+
+        Player player = st.getPlayer();
+
+        int lobbyIndex = player.getRank();
+
+        playersWaiting.get(lobbyIndex).add(st);
+
+        Match match = new Match((TreeSet<ServerThread>) playersWaiting.get(lobbyIndex).clone(), size, new ReentrantLock());
+        informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex), match);
+
+        new Thread(match).start();
+
+        gameEpoch[lobbyIndex]++;
+        conditionLobbiesAvailable[lobbyIndex].signal();
+        playersEntering[lobbyIndex] = 0;
     }
 }
