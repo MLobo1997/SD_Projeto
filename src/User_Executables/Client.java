@@ -18,6 +18,8 @@ public class Client {
     /** PrintWriter gerado do socket */
     private PrintWriter os         = null;
 
+    private ClientDaemon daemon;
+
     /**
      * Constructor
      */
@@ -63,7 +65,7 @@ public class Client {
                     registerPlayer();
                     loggedIn = loginPlayer();
                 } else {
-                    loggedIn = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
+                    loggedIn = loginPlayer();
                     if(!loggedIn){
                         toReg = true;
                     }
@@ -216,6 +218,7 @@ public class Client {
      * Desconecta o utilizador localmente.
      */
     private void disconnectUser (){
+
         System.out.println("Desligando do sistema.");
 
         try {
@@ -242,18 +245,6 @@ public class Client {
         catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error while communicating with server");
-        }
-        finally {
-            try {
-                is.close();
-                os.close();
-                socket.shutdownOutput();
-                socket.shutdownInput();
-                socket.close();
-            }catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error closing connections");
-            }
         }
     }
 
@@ -296,16 +287,17 @@ public class Client {
      * Método que faz o processamento após o login.
      */
     private void init(){
-        Thread t = new Thread(new ClientDaemon(socket));
         int cmd;
+
+        // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
+        daemon = new ClientDaemon(socket);
+        new Thread(daemon).start();
+
         do {
             cmd = startMenu();
 
             if (cmd == 1){
-                // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
-                t.start();
                 findMatch();
-                t.interrupt();
             }
         } while (cmd != 0);
         disconnectUser();
@@ -314,11 +306,17 @@ public class Client {
     public static void main(String args[]){
         int cmd;
 
+
         Client client = new Client();
 
-        client.connectUser(); //TODO: Justifica-se colocar Game_Information.Player?
+        client.connectUser();
 
         client.init();
+
+        client.daemon.signalKill();
+
+        System.exit(0);
+
     }
 }
 

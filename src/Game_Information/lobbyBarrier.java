@@ -118,6 +118,8 @@ public class lobbyBarrier {
             // só um jogador novo, re-iniciar lista de espera
             playersWaiting.get(lobbyIndex).clear();
             playersWaiting.get(lobbyIndex).add(st);
+        } else {
+            playersWaiting.get(lobbyIndex).add(st);
         }
 
         printPlayersInLobby(playersWaiting.get(lobbyIndex));

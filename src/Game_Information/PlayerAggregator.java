@@ -15,6 +15,7 @@ public class PlayerAggregator implements Serializable {
      */
     public PlayerAggregator(String file){
         players = loadPlayers(file);
+        //players = new HashMap<String,Player>();
     }
 
     public HashMap<String,Player> getPlayers() {
@@ -23,9 +24,6 @@ public class PlayerAggregator implements Serializable {
 
     /** Adicionar jogador à base de dados */
     public synchronized void addPlayer(Player p) {
-        if(p.isOnline()){
-            System.err.println("Ocorreu o erro de guardar um jogador com info online"); //TODO corrigir este erro (sem ser por por goOffline aqui de preferencia)
-        }
         players.put(p.getUsername(),p);
         savePlayersInfo();
     }
@@ -52,7 +50,7 @@ public class PlayerAggregator implements Serializable {
      */
     public void savePlayersInfo() {
         try  {
-            FileOutputStream saveFile = new FileOutputStream("../../players.sav");
+            FileOutputStream saveFile = new FileOutputStream("players.sav");
             try (ObjectOutputStream save = new ObjectOutputStream(saveFile)) {
                 save.writeObject(this);
             }
@@ -68,9 +66,9 @@ public class PlayerAggregator implements Serializable {
      * @return O registo de jogadores guardados se existir, senão retorna um completamente novo
      */
     public HashMap<String,Player> loadPlayers(String file) {
-        if (new File("../../" + file).exists()) {
+        if (new File(file).exists()) {
             try {
-                FileInputStream saveFile = new FileInputStream("../../" + file);
+                FileInputStream saveFile = new FileInputStream(file);
                 ObjectInputStream save = new ObjectInputStream(saveFile);
                 return (((PlayerAggregator) save.readObject()).players);
 
