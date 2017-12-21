@@ -37,7 +37,7 @@ public class lobbyBarrier {
      * Construtor
      */
     public lobbyBarrier() {
-        playersEntering = new int[size];
+        playersEntering = new int[rankNum];
 
         /* indice 0: Pessoas de rank 0
          * indice 1: Pessoas de rank 1
@@ -50,7 +50,7 @@ public class lobbyBarrier {
 
 
         // inicializar todos os TreeSets da lista
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < rankNum; i++) {
             playersWaiting.add(i,new TreeSet<>());
             lockLobbies[i] = new ReentrantLock();
             conditionLobbiesAvailable[i] = lockLobbies[i].newCondition();
@@ -84,15 +84,22 @@ public class lobbyBarrier {
      * @param st thread que presta serviços ao cliente
      */
     public void waitGame(ServerThread st) {
-            System.out.println("Entrou para a lista de espera o jogador " + st.getPlayer().getUsername());
-            // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
-            Player player = st.getPlayer();
+        System.out.println("Entrou para a lista de espera o jogador " + st.getPlayer().getUsername());
+        // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
+        Player player = st.getPlayer();
 
-            int lobbyIndex = player.getRank();
+        int lobbyIndex = player.getRank();
 
         try {
-            // Lock acedido quando são escritas variáveis partilhadas
+            // Locks acedidos quando são escritas variáveis partilhadas
+            if (lobbyIndex > 0) {
+                lockLobbies[lobbyIndex - 1].lock();
+            }
             lockLobbies[lobbyIndex].lock();
+
+            if (lobbyIndex < rankNum - 1) {
+                lockLobbies[lobbyIndex + 1].lock();
+            }
 
             // Em que instância de um certo lobby vou estar?
             int myEpoch = gameEpoch[lobbyIndex];
@@ -193,11 +200,11 @@ public class lobbyBarrier {
         int i = 0;
         TreeSet<ServerThread> t = new TreeSet<>();
 
-        if (lobbyIndex >= 0 && lobbyIndex <= size) {
-            for (ServerThread st : t) {
+        if (lobbyIndex >= 0 && lobbyIndex < rankNum) {
+            for (ServerThread st : playersWaiting.get(lobbyIndex)) { //para poder extrair apenas n
 
                 if (i < N) {
-                    break;
+                    break;   //acaba o ciclo quando já encontramos o número de jogadores necessário
                 }
 
                 t.add(st);
