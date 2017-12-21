@@ -92,45 +92,50 @@ public class lobbyBarrier {
 
         try {
             // Locks acedidos quando são escritas variáveis partilhadas
-            if (lobbyIndex > 0) {
+            if (lobbyIndex > 0) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente inferior
                 lockLobbies[lobbyIndex - 1].lock();
             }
             lockLobbies[lobbyIndex].lock();
 
-            if (lobbyIndex < rankNum - 1) {
+            if (lobbyIndex < rankNum - 1) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente superior
                 lockLobbies[lobbyIndex + 1].lock();
             }
-
-            // Em que instância de um certo lobby vou estar?
-            int myEpoch = gameEpoch[lobbyIndex];
 
             //Mais um jogador
             playersWaiting.get(lobbyIndex).add(st);
             playersEntering[lobbyIndex]++; //TODO: Como se vai mudar a implementação para ir buscar também aos vizinhos
 
+            System.out.println(player.getUsername() + "-- playersEntering: " + playersEntering[lobbyIndex]);
             // Já posso começar o jogo?
-            if (playersEntering[lobbyIndex] == size) {  //TODO: Colocar isto tudo dentro de uma função e com comentários a explicar
+            if (playersEntering[lobbyIndex] == size) {
                 startMatch(st);
-            }
-
-            else if (playersEntering[lobbyIndex] == 1) { //TODO Porque não fazer isto no final de startMatch e evitar este else if?
-                // só um jogador novo, re-iniciar lista de espera
-                playersWaiting.get(lobbyIndex).clear();
             }
 
             printPlayersInLobby(playersWaiting.get(lobbyIndex));
 
-            try {
-                while (myEpoch == gameEpoch[lobbyIndex]) {
-                    conditionLobbiesAvailable[lobbyIndex].await();
-                }
-            } catch (InterruptedException e) {
-                st.cleanup();
-            }
 
         }
-        finally {
-            lockLobbies[lobbyIndex].unlock(); //TODO: Talvez seja necessario mudar isto para antes do condition await?
+        finally { //desbloqueia tudo
+            if (lobbyIndex > 0) {
+                lockLobbies[lobbyIndex - 1].unlock();
+            }
+
+            lockLobbies[lobbyIndex].unlock();
+
+            if (lobbyIndex < rankNum - 1) {
+                lockLobbies[lobbyIndex + 1].unlock();
+            }
+        }
+
+        try {
+            // Em que instância de um certo lobby vou estar?
+            int myEpoch = gameEpoch[lobbyIndex];
+
+            while (myEpoch == gameEpoch[lobbyIndex]) { //TODO : Que é que isto faz exatamente (comentem que eu tenho a certeza pls)
+                conditionLobbiesAvailable[lobbyIndex].await(); //TODO: TA AQUI O BUG
+            }
+        } catch (InterruptedException e) {
+            st.cleanup();
         }
     }
 
@@ -139,6 +144,7 @@ public class lobbyBarrier {
      * @param st Server thread do jogador que se está a juntar
      */
     private void startMatch(ServerThread st){
+        System.out.println("VAI COMECAR A LOUCURAAAA");
 
         Player player = st.getPlayer();
 
@@ -153,6 +159,7 @@ public class lobbyBarrier {
         gameEpoch[lobbyIndex]++;
         conditionLobbiesAvailable[lobbyIndex].signal();
         playersEntering[lobbyIndex] = 0;
+        playersWaiting.get(lobbyIndex).clear();
     }
 
     /** Tenta encontrar 'size' jogadores no lobbie pedido em conjunto com o do seu rank anterior ou seguinte (exclusivamente).
