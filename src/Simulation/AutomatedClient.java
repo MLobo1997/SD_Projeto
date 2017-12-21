@@ -1,13 +1,15 @@
+package Simulation;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/** Classe runnable dos cliente gerados automáticamente.
- *
+/**
+ * Classe runnable dos cliente gerados automáticamente.
  */
-public class AutomatedClient implements Runnable{
+public class AutomatedClient implements Runnable {
     /** Username com que o cliente vai fazer login*/
     private String username;
     /** Password com que o cliente vai fazer login*/
