@@ -84,7 +84,7 @@ public class lobbyBarrier {
      * @param st thread que presta serviços ao cliente
      */
     public void waitGame(ServerThread st) {
-            System.out.println("Entrou para a lista de espera o jogador: " + st.getPlayer().getUsername());
+            System.out.println("Entrou para a lista de espera o jogador " + st.getPlayer().getUsername());
             // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
             Player player = st.getPlayer();
 
@@ -97,7 +97,8 @@ public class lobbyBarrier {
             // Em que instância de um certo lobby vou estar?
             int myEpoch = gameEpoch[lobbyIndex];
 
-            //Anuncia que entrou mais um jogador
+            //Mais um jogador
+            playersWaiting.get(lobbyIndex).add(st);
             playersEntering[lobbyIndex]++; //TODO: Como se vai mudar a implementação para ir buscar também aos vizinhos
 
             // Já posso começar o jogo?
@@ -108,7 +109,6 @@ public class lobbyBarrier {
             else if (playersEntering[lobbyIndex] == 1) { //TODO Porque não fazer isto no final de startMatch e evitar este else if?
                 // só um jogador novo, re-iniciar lista de espera
                 playersWaiting.get(lobbyIndex).clear();
-                playersWaiting.get(lobbyIndex).add(st);
             }
 
             printPlayersInLobby(playersWaiting.get(lobbyIndex));
@@ -137,7 +137,6 @@ public class lobbyBarrier {
 
         int lobbyIndex = player.getRank();
 
-        playersWaiting.get(lobbyIndex).add(st);
 
         Match match = new Match((TreeSet<ServerThread>) playersWaiting.get(lobbyIndex).clone(), size, new ReentrantLock());
         informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex), match);
@@ -194,8 +193,9 @@ public class lobbyBarrier {
         int i = 0;
         TreeSet<ServerThread> t = new TreeSet<>();
 
-        if (lobbyIndex >= 0 && lobbyIndex <= 9) {
+        if (lobbyIndex >= 0 && lobbyIndex <= size) {
             for (ServerThread st : t) {
+
                 if (i < N) {
                     break;
                 }

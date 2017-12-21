@@ -245,7 +245,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
                 cmd = in.readLine();
 
                 if (cmd.equals("1")){ //O jogador que jogar
-                    System.out.println(player.getUsername() + " wants to play a game");
                     // Procurar jogo e ficar inoperável até encontrar
                     matchmaker.waitGame(this);
 
