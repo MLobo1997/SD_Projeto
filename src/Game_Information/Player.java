@@ -12,21 +12,6 @@ public class Player implements Serializable, Cloneable {
     private String name;
     /** Passe de acesso do utilizador. */
     private String password;
-    /** Rank do jogador, valor entre 0 e 9, derivado da soma das classificações de todos os seus jogos já feitos.
-     * Rank = 0 -> xp =  [0 , 9[
-     * Rank = 1 -> xp =  [9 , 27[
-     * Rank = 2 -> xp =  [27 , 54[
-     * Rank = 3 -> xp =  [54 , 90[
-     * Rank = 4 -> xp =  [90 , 135[
-     * Rank = 5 -> xp =  [135 , 189[
-     * Rank = 6 -> xp =  [189 , 252[
-     * Rank = 7 -> xp =  [252 , 324[
-     * Rank = 8 -> xp =  [324 , 405[
-     * Rank = 9 -> xp >= 405
-     */
-    private Integer rank;
-    /** Experience points do jogador, utilizados para contabilizar a soma de todas as classificações obtidas pelo jogador, o que determina o rank. */
-    private Integer xp;
     /** Identifica se um utilizador já está associado a um cliente (prevenir vários clientes a associarem-se à mesma conta */
     private boolean online;
     /** Rank do jogador, valor entre 0 e 9, derivado da soma das classificações de todos os seus jogos já feitos.
