@@ -99,7 +99,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
         }
 
         allPlayers.savePlayersInfo();
-        Thread.currentThread().stop();
     }
 
     /**
@@ -375,6 +374,8 @@ public class ServerThread implements Comparable, Runnable, Observer {
 
         // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
         commandMode();
+
+        cleanup();
     }
 
     @Override

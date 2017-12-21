@@ -118,15 +118,15 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
-        echoMessage("Welcome to the match!");
+        echoMessage("O jogo começou!");
 
         for (int i = 0; i < 2; i++) {
-            echoMessage(i * 5 + " seconds passed.");
+            echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
 
         echoMessage("$GAMEOVER$");
-        echoMessage("Game is over");
+        echoMessage("Jogo acabou, escreva \"quit\" para voltar ao menu principal");
 
     }
 

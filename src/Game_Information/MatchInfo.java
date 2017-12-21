@@ -21,7 +21,7 @@ public class MatchInfo {
     /**
      * Construtor
      * @param players Coleção de jogadores a ingressar no jogo
-     * @param size Número de jogadores ( TODO: Sacar players.size() ao invés? )
+     * @param size Número de jogadores
      */
     public MatchInfo(TreeSet<ServerThread> players,int size) {
         this.messageBuffers = messageBuffers;

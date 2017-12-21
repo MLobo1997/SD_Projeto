@@ -14,6 +14,7 @@ public class ClientDaemon implements Runnable {
     private BufferedReader is = null;
     private PrintWriter os = null;
     private Socket socket = null;
+    private Boolean running = true;
 
     /**
      * Constructor
@@ -21,6 +22,7 @@ public class ClientDaemon implements Runnable {
      */
     public ClientDaemon(Socket s) {
         this.socket = s;
+        running = true;
 
         try {
             is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -28,6 +30,10 @@ public class ClientDaemon implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void signalKill() {
+        running = false;
     }
 
     @Override
@@ -46,7 +52,7 @@ public class ClientDaemon implements Runnable {
                 } else {
                     System.out.println(line);
                 }
-            } while(true);
+            } while(running);
         }
         catch (IOException e) {
             e.printStackTrace();
