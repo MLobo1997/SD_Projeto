@@ -127,6 +127,10 @@ public class lobbyBarrier {
         }
     }
 
+    /** Inicializa um lobby (match) com os 'size' jogadores.
+     *
+     * @param st Server thread do jogador que se está a juntar
+     */
     private void startMatch(ServerThread st){
 
         Player player = st.getPlayer();
@@ -143,5 +147,63 @@ public class lobbyBarrier {
         gameEpoch[lobbyIndex]++;
         conditionLobbiesAvailable[lobbyIndex].signal();
         playersEntering[lobbyIndex] = 0;
+    }
+
+    /** Tenta encontrar 'size' jogadores no lobbie pedido em conjunto com o do seu rank anterior ou seguinte (exclusivamente).
+     *
+     * @param lobbyIndex Identificador de lobby
+     * @return Estrutura com os 'size' jogadores encontrados ou então nenhum jogador, no caso de não conseguido arranjar 'size'.
+     */
+    private TreeSet<ServerThread> findMatchPlayers(int lobbyIndex){
+        int nsize;
+        TreeSet<ServerThread> tmp;
+        TreeSet<ServerThread> r = new TreeSet<>(playersWaiting.get(lobbyIndex));
+
+        nsize = size - r.size(); //Vê se o rank atual já tem jogadores suficientes
+        if (nsize == 0){ //senão tiver, vê se com o anterior já tem
+            tmp = getNPlayers(lobbyIndex - 1, nsize);
+
+            nsize = size - r.size() - tmp.size();
+
+            if (nsize == 0) { //Se tiver, adiciona
+                r.addAll(tmp);
+            }
+            else { //senão, tenta ver se o rank seguinte tem
+                tmp = getNPlayers(lobbyIndex + 1, nsize);
+
+                nsize = size - r.size() - tmp.size();
+
+                if (nsize == 0) { //se tiver, adiciona
+                    r.addAll(tmp);
+                }
+                else { //senão limpa o r para não retornar nenhum jogador de todo
+                    r.clear();
+                }
+            }
+        }
+
+        return r;
+    }
+
+    /** Adiciona um número específico de jogadores de um determinado rank de espera a um TreeSet
+     *
+     * @param lobbyIndex Rank de espera.
+     * @param N Número de jogadores a serem adicionados.
+     */
+    private TreeSet<ServerThread> getNPlayers(int lobbyIndex, int N){
+        int i = 0;
+        TreeSet<ServerThread> t = new TreeSet<>();
+
+        if (lobbyIndex >= 0 && lobbyIndex <= 9) {
+            for (ServerThread st : t) {
+                if (i < N) {
+                    break;
+                }
+
+                t.add(st);
+                i++;
+            }
+        }
+        return t;
     }
 }

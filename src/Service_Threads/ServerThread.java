@@ -19,7 +19,7 @@ import java.util.Observer;
  * Classe de threads geradas pelo servidor dedicadas a tratar de cada jogador individualmente
  */
 public class ServerThread implements Comparable, Runnable, Observer {
-    /**  ------ Connection info ----- */
+    /*  ------ Connection info ----- */
     /** Socket que liga cliente a Service_Threads.ServerThread */
     private Socket socket;
     /** Input stream retirado da socket */
@@ -27,15 +27,15 @@ public class ServerThread implements Comparable, Runnable, Observer {
     /** Output stream retirado da socket */
     private PrintWriter out;
 
-    /**  ----- Game info  ----- */
-    /**  ----- Game_Information.Player ----- */
+    /*  ----- Game info  ----- */
+    /*  ----- Game_Information.Player ----- */
     /** Registo de todos os jogadores - recurso partilhado do servidor principal */
     private PlayerAggregator allPlayers;
     /** Jogador atual que a serverThread está a servir , null caso nenhum */
     private Player player;
     /** Nome do jogador em formato de prefixo chat: username -> [username]: */
     private String wrappedUsername;
-    /**  ----- Service_Threads.Match ----- */
+    /*  ----- Service_Threads.Match ----- */
     /** Jogo atual ao qual jogador está alocado , null caso em nenhum */
     private Match currentMatch;
     /** Serviço de matchmaking, encarregue de bloquear threads até um jogo nas condições certas ser encontrado */
