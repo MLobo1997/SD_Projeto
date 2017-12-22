@@ -209,6 +209,19 @@ public class ServerThread implements Comparable, Runnable, Observer {
             // Login funcionou: atualizar a thread para ter agora referencia ao jogador
             player = p;
             player.goOnline();
+            //TODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTE
+
+            if(player.getUsername().equals("345"))
+                player.setRank(3);
+            if(player.getUsername().equals("456"))
+                player.setRank(2);
+            if(player.getUsername().equals("123"))
+                player.setRank(3);
+            if(player.getUsername().equals("234"))
+                player.setRank(2);
+
+
+            //TODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTETODO: APAGAR APENAS PARA TESTE
             System.out.println("O user " + username + " está agora online!");
             // Atualizar nome da thread para servir de identificador de chat
             wrappedUsername = "[" + player.getUsername() + "]: ";

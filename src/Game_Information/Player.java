@@ -163,4 +163,8 @@ public class Player implements Serializable, Cloneable {
                 ", online=" + online +
                 '}';
     }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
+    }
 }
