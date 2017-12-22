@@ -102,16 +102,18 @@ public class Match implements Runnable {
      */
     public void waitForGameToStart() {
         matchLock.lock();
-
-        while (threadsAwoken != matchInfo.getPlayerNum()) {
-            try {
-                allPlayersReady.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        try {
+            while (threadsAwoken != matchInfo.getPlayerNum()) {
+                try {
+                    allPlayersReady.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-        matchLock.unlock();
+        finally {
+            matchLock.unlock();
+        }
     }
 
     public void run() {
@@ -129,6 +131,4 @@ public class Match implements Runnable {
         echoMessage("Jogo acabou, escreva \"quit\" para voltar ao menu principal");
 
     }
-
-
 }
