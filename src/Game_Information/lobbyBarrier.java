@@ -89,6 +89,8 @@ public class lobbyBarrier {
         Player player = st.getPlayer();
 
         int lobbyIndex = player.getRank();
+        // Em que instância de um certo lobby vou estar?
+        int myEpoch = gameEpoch[lobbyIndex];
 
         try {
             // Locks acedidos quando são escritas variáveis partilhadas
@@ -100,18 +102,16 @@ public class lobbyBarrier {
 
             System.out.println(player.getUsername() + "-- playersEntering: " + playersEntering[lobbyIndex]);
             // Já posso começar o jogo?
-            if (playersEntering[lobbyIndex] == size) {
+            if (playersEntering[lobbyIndex] == size) { // TODO: Colocar aqui o cenas dos ranks
                 startMatch(st);
             }
 
             printPlayersInLobby(playersWaiting.get(lobbyIndex));
 
             try {
-                // Em que instância de um certo lobby vou estar?
-                int myEpoch = gameEpoch[lobbyIndex];
 
                 while (myEpoch == gameEpoch[lobbyIndex]) { //TODO : Que é que isto faz exatamente (comentem que eu não tenho a certeza pls)
-                    lobbiesAvailableAwait(lobbyIndex);
+                    lobbiesAvailableAwait(lobbyIndex, player);
                 }
             } catch (InterruptedException e) {
                 st.cleanup();
@@ -141,7 +141,7 @@ public class lobbyBarrier {
         new Thread(match).start();
 
         gameEpoch[lobbyIndex]++;
-        conditionLobbiesAvailable[lobbyIndex].signal();
+        conditionLobbiesAvailable[lobbyIndex].signal(); //TODO Aqui não terá que sinalizar mais que um no futuro?
         playersEntering[lobbyIndex] = 0;
         playersWaiting.get(lobbyIndex).clear();
     }
@@ -242,7 +242,7 @@ public class lobbyBarrier {
      * @param lobbyIndex Índice do lobby.
      * @throws InterruptedException No caso do await lançar a exceção.
      */
-    private void lobbiesAvailableAwait(int lobbyIndex) throws InterruptedException{
+    private void lobbiesAvailableAwait(int lobbyIndex, Player p) throws InterruptedException{
         if (lobbyIndex - 1 >= 0  && lockLobbies[lobbyIndex - 1].isLocked()) {
             lockLobbies[lobbyIndex - 1].unlock();
         }
@@ -251,7 +251,9 @@ public class lobbyBarrier {
             lockLobbies[lobbyIndex + 1].unlock();
         }
 
+        System.out.println("chega aqui 1" + p);
         conditionLobbiesAvailable[lobbyIndex].await();
+        System.out.println("chega aqui 2" + p);
 
     }
 }
