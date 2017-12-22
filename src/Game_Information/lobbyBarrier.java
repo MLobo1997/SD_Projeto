@@ -107,7 +107,7 @@ public class lobbyBarrier {
         // Já posso começar o jogo?
         if (playersEntering[lobbyIndex] == size) {
             playersWaiting.get(lobbyIndex).add(st);
-            Match match = new Match((TreeSet<ServerThread>)playersWaiting.get(lobbyIndex).clone(),size,new ReentrantLock());
+            Match match = new Match((TreeSet<ServerThread>)playersWaiting.get(lobbyIndex).clone(), size ,new ReentrantLock());
             informThreadsOfAddedMatch(playersWaiting.get(lobbyIndex),match);
             new Thread(match).start();
             gameEpoch[lobbyIndex]++;

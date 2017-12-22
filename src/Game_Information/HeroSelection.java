@@ -7,10 +7,11 @@ public class HeroSelection {
 
     /**
      * Construtor
+     * @param playerNum número de jogadores na equipa
      */
-    public HeroSelection() {
-        escolhas = new int[playerNum]; // TODO: MUDAR ESTA VARIAVEL TEMPORARIA
-        playerNum = 2;
+    public HeroSelection(int playerNum) {
+        this.playerNum = playerNum;
+        escolhas = new int[playerNum];
     }
 
     /**

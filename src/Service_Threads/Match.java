@@ -25,7 +25,7 @@ public class Match implements Runnable {
      */
     public Match (TreeSet<ServerThread> players,int size,ReentrantLock matchLock) {
         /** Clonar para não ficar com serverThreads de outro jogo quando for modificado */
-        matchInfo = new MatchInfo(players,size);
+        matchInfo = new MatchInfo(players, players.size());
         this.matchLock = matchLock;
         allPlayersReady = this.matchLock.newCondition();
         threadsAwoken = 0;
@@ -114,14 +114,24 @@ public class Match implements Runnable {
         matchLock.unlock();
     }
 
+    /**
+     * Escolha do herói
+     * @param s jogador que escolheu o herói
+     * @param hero indíce do herói escolhido
+     * @return verdade se foi possível escolher o herói, falso caso contrário
+     */
+    public boolean chooseHero(ServerThread s, int hero){
+        return matchInfo.chooseHero(s,hero);
+    }
+
     public void run() {
 
         waitForGameToStart();
 
         echoMessage("O jogo começou!");
 
-        for (int i = 0; i < 2; i++) {
-            echoMessage(i * 5 + " segundos passaram.");
+        for (int i = 0; i < 7; i++) {
+            //echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
 
