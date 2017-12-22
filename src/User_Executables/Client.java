@@ -235,6 +235,7 @@ public class Client {
      * Ler informação do cliente necessária para inicializar jogo
      */
     private void findMatch() {
+        System.out.println("Estamos a procura de um jogo... [quit]"); //TODO se fizemos quit enquanto procura um jogo escacha tudo
         try {
             String lineInput = scanner.readLine();
             while (!lineInput.equals("quit")) {

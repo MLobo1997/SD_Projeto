@@ -24,7 +24,7 @@ public class lobbyBarrier {
     /** Número de ranks */
     private static final int rankNum = 10;
     /** Número de jogadores por jogo.*/
-    public static final int size = 2; // TODO: Valor temporário, mudar
+    public static final int size = 3; // TODO: Valor temporário, mudar
     /** Coleção de threads dedicadas a jogadores.*/
     private HashSet<ServerThread> players;
     /** Lock associado à condição do lobby i */
@@ -100,7 +100,7 @@ public class lobbyBarrier {
             playersWaiting.get(lobbyIndex).add(st);
             playersEntering[lobbyIndex]++; //TODO: Como se vai mudar a implementação para ir buscar também aos vizinhos
 
-            System.out.println(player.getUsername() + "-- playersEntering: " + playersEntering[lobbyIndex]);
+            System.out.println("Lobby de rank " + player.getRank() +  " já tem " + playersEntering[lobbyIndex] + " jogadores.");
             // Já posso começar o jogo?
             if (playersEntering[lobbyIndex] == size) { // TODO: Colocar aqui o cenas dos ranks
                 startMatch(st);
@@ -128,7 +128,7 @@ public class lobbyBarrier {
      * @param st Server thread do jogador que se está a juntar
      */
     private void startMatch(ServerThread st){
-        System.out.println("VAI COMECAR A LOUCURAAAA");
+        System.out.println("A iniciar um jogo.");
 
         Player player = st.getPlayer();
 
@@ -141,7 +141,7 @@ public class lobbyBarrier {
         new Thread(match).start();
 
         gameEpoch[lobbyIndex]++;
-        conditionLobbiesAvailable[lobbyIndex].signal(); //TODO Aqui não terá que sinalizar mais que um no futuro?
+        conditionLobbiesAvailable[lobbyIndex].signalAll(); //TODO será necessário notificar os dos outros ranks.
         playersEntering[lobbyIndex] = 0;
         playersWaiting.get(lobbyIndex).clear();
     }
@@ -251,9 +251,7 @@ public class lobbyBarrier {
             lockLobbies[lobbyIndex + 1].unlock();
         }
 
-        System.out.println("chega aqui 1" + p);
         conditionLobbiesAvailable[lobbyIndex].await();
-        System.out.println("chega aqui 2" + p);
 
     }
 }
