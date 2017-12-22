@@ -354,8 +354,17 @@ public class ServerThread implements Comparable, Runnable, Observer {
             // Timestamp de quando a mensagem foi enviada
             String timestamp;
             while(!(str.equals("quit") || str.equals("$GAMEOVER$"))) {
-                timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
-                echoMessage(timestamp + wrappedUsername + str);
+                if(str.matches("&CHOOSE [12]?[0-9]&")){
+                    int hero = Integer.parseInt(str.replaceAll("[\\D]", ""));
+                    boolean res = currentMatch.chooseHero(this, hero);
+                    if(res == true) out.println("Herói escolhido com sucesso!");
+                    else out.println("O Herói já foi selecionado! Tente outro!");
+                }
+                else {
+                    timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
+                    echoMessage(timestamp + wrappedUsername + str);
+                }
+
                 str = in.readLine();
             }
 
@@ -386,6 +395,11 @@ public class ServerThread implements Comparable, Runnable, Observer {
         } else {
             return difference;
         }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        return o == this;
     }
 
     /**
