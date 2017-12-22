@@ -92,14 +92,7 @@ public class lobbyBarrier {
 
         try {
             // Locks acedidos quando são escritas variáveis partilhadas
-            if (lobbyIndex > 0) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente inferior
-                lockLobbies[lobbyIndex - 1].lock();
-            }
-            lockLobbies[lobbyIndex].lock();
-
-            if (lobbyIndex < rankNum - 1) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente superior
-                lockLobbies[lobbyIndex + 1].lock();
-            }
+            lockLobbies(lobbyIndex);
 
             //Mais um jogador
             playersWaiting.get(lobbyIndex).add(st);
@@ -113,30 +106,21 @@ public class lobbyBarrier {
 
             printPlayersInLobby(playersWaiting.get(lobbyIndex));
 
+            try {
+                // Em que instância de um certo lobby vou estar?
+                int myEpoch = gameEpoch[lobbyIndex];
 
+                while (myEpoch == gameEpoch[lobbyIndex]) { //TODO : Que é que isto faz exatamente (comentem que eu não tenho a certeza pls)
+                    lobbiesAvailableAwait(lobbyIndex);
+                }
+            } catch (InterruptedException e) {
+                st.cleanup();
+            }
         }
         finally { //desbloqueia tudo
-            if (lobbyIndex > 0) {
-                lockLobbies[lobbyIndex - 1].unlock();
-            }
-
-            lockLobbies[lobbyIndex].unlock();
-
-            if (lobbyIndex < rankNum - 1) {
-                lockLobbies[lobbyIndex + 1].unlock();
-            }
+            unlockLobbies(lobbyIndex);
         }
 
-        try {
-            // Em que instância de um certo lobby vou estar?
-            int myEpoch = gameEpoch[lobbyIndex];
-
-            while (myEpoch == gameEpoch[lobbyIndex]) { //TODO : Que é que isto faz exatamente (comentem que eu tenho a certeza pls)
-                conditionLobbiesAvailable[lobbyIndex].await(); //TODO: TA AQUI O BUG
-            }
-        } catch (InterruptedException e) {
-            st.cleanup();
-        }
     }
 
     /** Inicializa um lobby (match) com os 'size' jogadores.
@@ -219,5 +203,55 @@ public class lobbyBarrier {
             }
         }
         return t;
+    }
+
+    /** Método que bloqueia um o lock de uma threads e o das suas vizinhas imediatas.
+     *
+     * @param lobbyIndex Índice do lobby a ser trancado.
+     */
+    private void lockLobbies(int lobbyIndex){
+        if (lobbyIndex - 1 >= 0 ) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente inferior
+            lockLobbies[lobbyIndex - 1].lock();
+        }
+
+        lockLobbies[lobbyIndex].lock();
+
+        if (lobbyIndex + 1 < rankNum) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente superior
+            lockLobbies[lobbyIndex + 1].lock();
+        }
+    }
+
+    /** Método que desbloqueia um o lock de uma threads e o das suas vizinhas imediatas.
+     *
+     * @param lobbyIndex Índice do lobby a ser desbloqueado.
+     */
+    private void unlockLobbies(int lobbyIndex){
+        if (lobbyIndex - 1 >= 0  && lockLobbies[lobbyIndex - 1].isLocked()) {
+            lockLobbies[lobbyIndex - 1].unlock();
+        }
+
+        lockLobbies[lobbyIndex].unlock();
+
+        if (lobbyIndex + 1 < rankNum && lockLobbies[lobbyIndex + 1].isLocked()) {
+            lockLobbies[lobbyIndex + 1].unlock();
+        }
+    }
+
+    /** Faz o wait da condição do lobby estar livre.
+     *
+     * @param lobbyIndex Índice do lobby.
+     * @throws InterruptedException No caso do await lançar a exceção.
+     */
+    private void lobbiesAvailableAwait(int lobbyIndex) throws InterruptedException{
+        if (lobbyIndex - 1 >= 0  && lockLobbies[lobbyIndex - 1].isLocked()) {
+            lockLobbies[lobbyIndex - 1].unlock();
+        }
+
+        if (lobbyIndex + 1 < rankNum && lockLobbies[lobbyIndex + 1].isLocked()) {
+            lockLobbies[lobbyIndex + 1].unlock();
+        }
+
+        conditionLobbiesAvailable[lobbyIndex].await();
+
     }
 }
