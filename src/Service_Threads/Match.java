@@ -1,13 +1,21 @@
 package Service_Threads;
 
 import Game_Information.MatchInfo;
+import Game_Information.Player;
+import Game_Information.lobbyBarrier;
+import User_Executables.Server;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeSet;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Match implements Runnable {
     /**
@@ -27,6 +35,8 @@ public class Match implements Runnable {
      * Condição: Já todas as threads dos jogadores estão acordadas?
      */
     private Condition allPlayersReady;
+    /** Número de jogadores por match*/
+    static final int size = lobbyBarrier.size;
 
     /**
      * Construtor
@@ -178,12 +188,33 @@ public class Match implements Runnable {
             echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
+        List<Player> results = defineRanking().stream().map(ServerThread::getPlayer).collect(Collectors.toList());
+        System.out.println("Resultados: " + results);
 
         echoMessage("&GAMEOVER&");
-        echoMessage("Jogo acabou, escreva \"quit\" para voltar ao menu principal");
 
         saveGameInfo();
 
 
     }
+
+    /** Distribui aleatóriamente os jogadores de um match por um array, representando os seus rankings no jogo.
+     *
+     * @return Array de rankings.
+     */
+    private ArrayList<ServerThread> defineRanking() {
+
+        LinkedList<ServerThread> players = new LinkedList<>(matchInfo.getPlayers());
+        ArrayList<ServerThread> r = new ArrayList<>();
+        int playerPos;
+
+        for (int i = 0 ; i < size; i++) {
+            playerPos = ThreadLocalRandom.current().nextInt(size - i); //ThreadLocalRandom utilizado em vez de Random por recomendação na própria documentação em 'https://docs.oracle.com/javase/8/docs/api/java/util/Random.html'
+            r.add(i, players.get(playerPos));
+            players.remove(playerPos);
+        }
+
+        return r;
+    }
+
 }

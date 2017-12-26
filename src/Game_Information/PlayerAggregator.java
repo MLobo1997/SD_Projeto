@@ -6,7 +6,7 @@ import java.util.HashMap;
 /**
  * Classe utilizada para registar todos o utilizadores existentes até ao momento.
  */
-public class PlayerAggregator implements Serializable {
+public class PlayerAggregator implements Serializable, Cloneable {
     /** Coleção de todos os jogadores registados no programa, chave é o nome do jogador */
     private HashMap<String, Player> players;
 
@@ -18,6 +18,15 @@ public class PlayerAggregator implements Serializable {
         //players = new HashMap<String,Player>();
     }
 
+    /** Contrutor por cópia
+     *
+     * @param p Original
+     */
+    private PlayerAggregator(PlayerAggregator p) {
+        this.players = new HashMap<>(p.players);
+        this.players.values().forEach(Player::clone);
+    }
+
     public HashMap<String,Player> getPlayers() {
         return players;
     }
@@ -26,6 +35,13 @@ public class PlayerAggregator implements Serializable {
     public synchronized void addPlayer(Player p) {
         players.put(p.getUsername(),p);
         savePlayersInfo();
+    }
+
+    /** Coloca a informação de todos os jogadores como offline.
+     *
+     */
+    public void allPlayersGoOffline(){
+        players.values().forEach(Player::goOffline);
     }
 
     /**
@@ -49,10 +65,13 @@ public class PlayerAggregator implements Serializable {
      * Guarda informação de todos os jogadores
      */
     public void savePlayersInfo() {
+        PlayerAggregator cl = (PlayerAggregator) this.clone();
+        cl.allPlayersGoOffline(); //solução provisória para não nos termos de chatear para já //TODO TIRAR
+
         try  {
             FileOutputStream saveFile = new FileOutputStream("players.sav");
             try (ObjectOutputStream save = new ObjectOutputStream(saveFile)) {
-                save.writeObject(this);
+                save.writeObject(cl);
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -103,5 +122,10 @@ public class PlayerAggregator implements Serializable {
         else {
            throw new IllegalArgumentException("O jogador não existe no sistema!!");
         }
+    }
+
+    @Override
+    public Object clone(){
+        return new PlayerAggregator(this);
     }
 }
