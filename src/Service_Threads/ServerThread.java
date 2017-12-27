@@ -325,6 +325,8 @@ public class ServerThread implements Comparable, Runnable, Observer {
      */
     public void signalReady() {
 
+        System.out.println("Signaling");
+
         int playerNum = currentMatch.getMatchInfo().getPlayerNum();
 
         currentMatch.getMatchLock().lock();
