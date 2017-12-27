@@ -43,22 +43,19 @@ public class ClientDaemon implements Runnable {
             do {
                 line = is.readLine();
                 if (line == null) {
-                    System.out.println("Unable to reach server (possible shutdown).");
+                    System.out.println("Ligação com o servidor perdida.");
                     socket.close();
                     is.close();
                     break;
-                } if (line.equals("$GAMEOVER$")) {
+                } if (line.equals("&GAMEOVER&")) {
                     os.println(line);
                 } else {
                     System.out.println(line);
                 }
             } while(running);
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (NullPointerException e2) {
-            System.out.println("Unable to reach server (possible shutdown).");
+        catch (IOException | NullPointerException e) {
+            System.out.println("Ligação com o servidor perdida.");
         }
     }
 }

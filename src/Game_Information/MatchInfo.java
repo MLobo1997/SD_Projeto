@@ -80,6 +80,30 @@ public class MatchInfo {
     }
 
     /**
+     * Demonstra nomes dos jogadores na equipa 1
+     * @return String que identifica jogadores da equipa 1
+     */
+    public String getPlayersTeamOne() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("| ");
+        teamOne.forEach(x -> sb.append(x.getPlayer().getUsername() + " | "));
+
+        return sb.toString();
+    }
+
+    /**
+     * Demonstra nomes dos jogadores na equipa 2
+     * @return String que identifica jogadores da equipa 2
+     */
+    public String getPlayersTeamTwo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("| ");
+        teamTwo.forEach(x -> sb.append(x.getPlayer().getUsername() + " | "));
+
+        return sb.toString();
+    }
+
+    /**
      * Escolha do herói
      * @param s jogador que escolheu o herói
      * @param hero indíce do herói escolhido

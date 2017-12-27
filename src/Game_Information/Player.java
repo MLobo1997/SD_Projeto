@@ -66,7 +66,7 @@ public class Player implements Serializable, Cloneable {
      *
      * @return pass.
      */
-    private String getPassword() { return password; }
+    public String getPassword() { return password; }
 
     /**
      * Sinalizar jogador como online

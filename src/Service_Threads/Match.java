@@ -130,14 +130,18 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
+
+
+        echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
+        echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
 
         for (int i = 0; i < 7; i++) {
-            //echoMessage(i * 5 + " segundos passaram.");
+            echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
 
-        echoMessage("$GAMEOVER$");
+        echoMessage("&GAMEOVER&");
         echoMessage("Jogo acabou, escreva \"quit\" para voltar ao menu principal");
 
     }

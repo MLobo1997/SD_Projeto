@@ -239,9 +239,7 @@ public class lobbyBarrier {
             lockLobbies[lobbyIndex + 1].unlock();
         }
 
-        System.out.println("Cheguei");
         conditionLobbiesAvailable[lobbyIndex].await();
-        System.out.println("Avancei");
     }
 
     /** Finaliza e "limpa" o método waitGame

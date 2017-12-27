@@ -99,6 +99,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
         }
 
         allPlayers.savePlayersInfo();
+        Thread.currentThread().stop();
     }
 
     /**
@@ -270,7 +271,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
         boolean loggedIn = false;
         boolean canPlay = false;
         String str = null;
-        // TODO: Deixar a qualquer momento alternar entre modos (com keywords reservadas como por exemplo <REGISTER>
 
         while (!loggedIn) {
             try {
@@ -298,7 +298,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     registerPlayer();
                     loggedIn = loginPlayer();
                 } else {
-                    loggedIn = loginPlayer(); //TODO fazer o user poder voltar para register em caso de engano
+                    loggedIn = loginPlayer();
                     if(!loggedIn){
                         toReg = true;
                     }
@@ -340,6 +340,14 @@ public class ServerThread implements Comparable, Runnable, Observer {
     }
 
     /**
+     * Cria timestamp da altura em que o método foi chamado
+     * @return timestamp a retornar
+     */
+    public String generateTimeStamp() {
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
+
+    /**
      * Inicializar o protocolo de comunicação para jogo. Neste método, todas as linhas lidas do jogador
      * são interpretadas como mensagens de chat ou comandos de jogo
      */
@@ -351,18 +359,19 @@ public class ServerThread implements Comparable, Runnable, Observer {
             // Mensagem de input
             String str = in.readLine();
 
-            // Timestamp de quando a mensagem foi enviada
-            String timestamp;
-            while(!(str.equals("quit") || str.equals("$GAMEOVER$"))) {
+            while((str != null) && !(str.equals("quit") || str.equals("&GAMEOVER&"))) {
                 if(str.matches("&CHOOSE [12]?[0-9]&")){
                     int hero = Integer.parseInt(str.replaceAll("[\\D]", ""));
                     boolean res = currentMatch.chooseHero(this, hero);
-                    if(res == true) out.println("Herói escolhido com sucesso!");
+                    if(res == true) {
+                        String strclone = str;
+                        String heroNum = strclone.substring(0,str.length()-1).split(" ")[1];
+                        echoMessage("1" + generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + heroNum);
+                    }
                     else out.println("O Herói já foi selecionado! Tente outro!");
                 }
                 else {
-                    timestamp = (new SimpleDateFormat("HH:mm:ss").format(new Date())) + " ";
-                    echoMessage(timestamp + wrappedUsername + str);
+                    echoMessage("2"+generateTimeStamp() + " " + wrappedUsername + str);
                 }
 
                 str = in.readLine();
@@ -374,8 +383,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
     }
 
     public void run() {
-        // TODO: Lidar devidamente com exceções (fazer logoff ao jogador)
-
         // Protocolo: primeira mensagem: modo (registar(0) ou login(1))
 
         // Deixar cliente fazer login / registo

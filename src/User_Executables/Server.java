@@ -40,7 +40,7 @@ public class Server {
                 socket = server.accept();
                 /* Iniciar novo prestador de serviços para cliente */
                 ServerThread serverThread = new ServerThread(socket,allPlayers,matchmaker);
-                new Thread(new ServerThread(socket,allPlayers,matchmaker)).start();
+                new Thread(serverThread).start();
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -49,11 +49,11 @@ public class Server {
     }
 
     public static void main(String [] args){
-        // TODO: Iniciar implementação gráfica
-        // TODO: Monitor de servidor (para permitir sair seguramente e só aí guardar registos)
         try {
             Server s = new Server();
-            System.out.println(s.allPlayers.getPlayers());
+            System.out.print("[");
+            s.allPlayers.getPlayers().forEach((key,value) -> System.out.print("(Player:"+value.getUsername()+",pswrd:"+value.getPassword()+",rank:"+value.getRank()+")"));
+            System.out.println("]");
             s.runServer();
         } catch (IOException e) {
             e.printStackTrace();
