@@ -129,11 +129,7 @@ public class Match implements Runnable {
 
     public void run() {
 
-        System.out.println("Meme 1");
-
         waitForGameToStart();
-
-        System.out.println("Meme 2");
 
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
