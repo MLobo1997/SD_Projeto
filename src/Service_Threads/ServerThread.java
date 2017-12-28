@@ -325,8 +325,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
      */
     public void signalReady() {
 
-        System.out.println("Signaling");
-
         int playerNum = currentMatch.getMatchInfo().getPlayerNum();
 
         currentMatch.getMatchLock().lock();
@@ -368,12 +366,12 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     if(res == true) {
                         String strclone = str;
                         String heroNum = strclone.substring(0,str.length()-1).split(" ")[1];
-                        echoMessage("1" + generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + heroNum);
+                        echoMessage(generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + heroNum);
                     }
                     else out.println("O Herói já foi selecionado! Tente outro!");
                 }
                 else {
-                    echoMessage("2"+generateTimeStamp() + " " + wrappedUsername + str);
+                    echoMessage(generateTimeStamp() + " " + wrappedUsername + str);
                 }
 
                 str = in.readLine();

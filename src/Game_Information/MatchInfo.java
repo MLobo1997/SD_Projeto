@@ -30,19 +30,19 @@ public class MatchInfo {
      * @param size Número de jogadores
      */
     public MatchInfo(TreeSet<ServerThread> players, int size) {
-        this.messageBuffers = messageBuffers;
+        this.messageBuffers = new TreeSet<>();
         this.players = players;
         this.playerNum = size;
-        this.teamOne = new TreeSet<ServerThread>();
-        this.teamTwo = new TreeSet<ServerThread>();
+        this.teamOne = new TreeSet<>();
+        this.teamTwo = new TreeSet<>();
         int i = 0;
         for(ServerThread s: players){
             if(i % 2 == 1) teamOne.add(s);
             else teamTwo.add(s);
             i++;
         }
-        this.picksTeamOne = new HeroSelection(teamOne.size());
-        this.picksTeamTwo = new HeroSelection(teamTwo.size());
+        this.picksTeamOne = new HeroSelection();
+        this.picksTeamTwo = new HeroSelection();
     }
 
 
@@ -86,7 +86,8 @@ public class MatchInfo {
     public String getPlayersTeamOne() {
         StringBuilder sb = new StringBuilder();
         sb.append("| ");
-        teamOne.forEach(x -> sb.append(x.getPlayer().getUsername() + " | "));
+        teamOne.forEach(x -> sb.append("name:" + x.getPlayer().getUsername() + ",rank:" + x.getPlayer().getRank()
+                +",hero:" + (this.getHeroPick(x) == -1 ? "n/a" : this.getHeroPick(x)) + " | "));
 
         return sb.toString();
     }
@@ -98,9 +99,30 @@ public class MatchInfo {
     public String getPlayersTeamTwo() {
         StringBuilder sb = new StringBuilder();
         sb.append("| ");
-        teamTwo.forEach(x -> sb.append(x.getPlayer().getUsername() + " | "));
+        teamTwo.forEach(x -> sb.append("name:" + x.getPlayer().getUsername() + ",rank:" + x.getPlayer().getRank()
+                +",hero:" + (this.getHeroPick(x) == -1 ? "n/a" : this.getHeroPick(x)) + " | "));
 
         return sb.toString();
+    }
+
+    private int getHeroPick(ServerThread st) {
+
+        int team = -1;
+
+        if(teamOne.stream().filter(t -> t == st).count() == 1){
+            team = 1;
+        }
+        if(teamTwo.stream().filter(t -> t == st).count() == 1){
+            team = 2;
+        }
+
+        if (team == 1) {
+            return picksTeamOne.getHero(st.getPlayer().getUsername());
+        } else if (team == 2) {
+            return picksTeamTwo.getHero(st.getPlayer().getUsername());
+
+        }
+        return -1;
     }
 
     /**
@@ -113,13 +135,12 @@ public class MatchInfo {
         boolean res = false;
 
         if(teamOne.stream().filter(t -> t == s).count() == 1){
-            int playerIndex = teamOne.headSet(s).size();
-            res = picksTeamOne.chooseHero(playerIndex,hero);
+            res = picksTeamOne.chooseHero(s.getPlayer().getUsername(),hero);
         }
         if(teamTwo.stream().filter(t -> t == s).count() == 1){
-            int playerIndex = teamTwo.headSet(s).size();
-            res = picksTeamTwo.chooseHero(playerIndex,hero);
+            res = picksTeamTwo.chooseHero(s.getPlayer().getUsername(),hero);
         }
+
         return res;
     }
 }
