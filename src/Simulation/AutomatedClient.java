@@ -1,9 +1,6 @@
 package Simulation;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -22,6 +19,8 @@ public class AutomatedClient implements Runnable {
     private Socket socket;
     /** Variável que define se é suposto o cliente fazer log out.*/
     private Boolean leave;
+    /**Utilizado para gerar a string que no final da execução será registada em ficheiro para demonstrar o output do client automatizado*/
+    private StringBuilder log;
 
     /** Construtor do cliente.
      *
@@ -39,6 +38,7 @@ public class AutomatedClient implements Runnable {
             e.printStackTrace();
         }
         this.leave = false;
+        this.log = new StringBuilder();
     }
 
     /** Tenta realizar o registo de um jogador automatizado. TODO:Adicionar capacidade de no caso de já estar registado saltar para o login
@@ -47,6 +47,7 @@ public class AutomatedClient implements Runnable {
     private void tryToRegister(){
         boolean alreadyExists = false;
 
+        log.append("A tentar fazer registo.\n");
         out.println(username); //dizer ao servidor o username
         out.println(password);//dizer ao servidor a password
 
@@ -55,6 +56,7 @@ public class AutomatedClient implements Runnable {
             alreadyExists = in.readLine().equals("0");
             if(alreadyExists) {
                 out.println("-1"); //comunica ao servidor que é para saltar para o login
+                log.append("O utilizador já existia.\n");
             }
             else {
                 out.println("1"); //confirma ao servidor para finalizar o registo.
@@ -115,10 +117,26 @@ public class AutomatedClient implements Runnable {
         }
     }
 
+    private void printLog () {
+        FileWriter fw;
+        File dir = new File("botLogs");
+
+        try {
+            dir.mkdir(); //cria a diretoria
+
+            fw = new FileWriter("botLogs/" + username + ".log");
+            fw.write(log.toString());
+            fw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         connectUser();
         out.println("0"); //para fazer logout PROVISORIO
+        printLog();
         disconnectUser();
     }
 }
