@@ -41,13 +41,21 @@ public class AutomatedClient implements Runnable {
         this.log = new StringBuilder();
     }
 
+    /** Getter de username.
+     *
+     * @return Username.
+     */
+    public String getUsername() {
+        return username;
+    }
+
     /** Tenta realizar o registo de um jogador automatizado. TODO:Adicionar capacidade de no caso de já estar registado saltar para o login
      *
      */
     private void tryToRegister(){
         boolean alreadyExists = false;
 
-        log.append("A tentar fazer registo.\n");
+        log.append("---A tentar fazer registo.---\n");
         out.println(username); //dizer ao servidor o username
         out.println(password);//dizer ao servidor a password
 
@@ -60,6 +68,7 @@ public class AutomatedClient implements Runnable {
             }
             else {
                 out.println("1"); //confirma ao servidor para finalizar o registo.
+                log.append("O utilizador foi registado com sucesso\n");
             }
 
         } catch (IOException e) {
@@ -72,6 +81,7 @@ public class AutomatedClient implements Runnable {
      */
     private void loginUser(){
         String str;
+        log.append("---A fazer login---\n");
 
         try {
             out.println(username); //dizer ao servidor o username
@@ -80,14 +90,18 @@ public class AutomatedClient implements Runnable {
             str = in.readLine();
             switch (str) {
                 case "1":
+                    log.append("O utilizador fez o login com sucesso.\n");
                     break;
                 case "0":
+                    log.append("O utilizador não fez o login pois não está registado.\n");
                     System.err.println("Tried to login the following user who doesn't exist: " + username);
                     break;
                 case "-1":
+                    log.append("O utilizador não fez o login pois não a password estava incorreta.\n");
                     System.err.println("Tried to login the following whose password is incorrect: " + username);
                     break;
                 case "-2":
+                    log.append("O utilizador não fez o login já se encontrava online.\n");
                     System.err.println("Tried to login the following who is already online: " + username);
                     break;
             }
@@ -103,10 +117,13 @@ public class AutomatedClient implements Runnable {
         loginUser();
     }
 
-    /** Desconecta o utilizador localmente.
+    /** Termina a sessão.
      *
      */
     private void disconnectUser (){
+        log.append("---Utilizador a desconectar---\n");
+        out.println("0"); //para fazer logout
+        printLog();
         try {
             in.close();
             out.close();
@@ -117,6 +134,9 @@ public class AutomatedClient implements Runnable {
         }
     }
 
+    /** Escreve tudo o que se encontra na variável log num ficheiro.
+     *
+     */
     private void printLog () {
         FileWriter fw;
         File dir = new File("botLogs");
@@ -132,11 +152,29 @@ public class AutomatedClient implements Runnable {
         }
     }
 
-    @Override
+    void signalToLeave() {
+        leave = true;
+    }
+
+    /** Coloca o cliente num ciclo de jogos.
+     *
+     */
+    private void play () {
+        log.append("---O utilizador entrou no ciclo de jogos---\n");
+
+        while (!leave) {
+            System.out.println(leave);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void run() {
         connectUser();
-        out.println("0"); //para fazer logout PROVISORIO
-        printLog();
+        play();
         disconnectUser();
     }
 }

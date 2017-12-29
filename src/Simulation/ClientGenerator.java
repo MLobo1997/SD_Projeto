@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,8 +19,10 @@ public class ClientGenerator {
     private Integer N;
     /** Variável para permitir fazer reads de input mais facilmente*/
     private BufferedReader scanner;
-    /** Conjunto de threads dos clientes a ser corridos*/
-    private HashSet<Thread> clients;
+    /** Conjunto de threads dos clientes a ser corridos, mapeados por username*/
+    private HashMap<String, Thread> threads;
+    /** Conjunto de clientes a ser corridos, mapeados por username*/
+    private HashMap<String, AutomatedClient> clients;
 
     /**
      * Construtor da classe Simulation.ClientGenerator.
@@ -27,7 +30,8 @@ public class ClientGenerator {
     private ClientGenerator(){
         scanner = new BufferedReader(new InputStreamReader(System.in));
         N = initSetN();
-        clients = new HashSet<>();
+        threads = new HashMap<>();
+        clients = new HashMap<>();
         runClients(loadPlayersInfo());
     }
 
@@ -50,8 +54,9 @@ public class ClientGenerator {
     private void initThread(String user, String pass){
         AutomatedClient c = new AutomatedClient(user, pass);
         Thread t = new Thread(c);
-        clients.add(t);
-        t.run();
+        threads.put(user, t);
+        clients.put(user, c);
+        t.start();
     }
 
     /**
@@ -104,15 +109,41 @@ public class ClientGenerator {
         return n;
     }
 
-    public static void main (String [] args){
-        ClientGenerator cg = new ClientGenerator();
+    private void menu () {
+        System.out.println("[+] para adicionar mais um cliente, [-] para desconectar e [q] para matar o gerador.");
+        char cmd;
 
-        for(Thread t : cg.clients){
+        try {
+
+            do {
+                cmd = (char) System.in.read();
+                System.out.println(cmd);
+            } while (cmd != 'q');
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("A sair.");
+    }
+
+    /** Mata e espera que morram todos os clientes.
+     *
+     */
+    private void killAllClients () {
+        for(AutomatedClient c : clients.values()){
             try {
-                t.join();
+                c.signalToLeave();
+                threads.get(c.getUsername()).join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void main (String [] args){
+        ClientGenerator cg = new ClientGenerator();
+
+        cg.menu();
+
+        cg.killAllClients();
     }
 }
