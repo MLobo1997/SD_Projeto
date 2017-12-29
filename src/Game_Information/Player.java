@@ -1,6 +1,5 @@
 package Game_Information;
 
-import Exceptions.LevelUpException;
 
 import java.io.Serializable;
 
@@ -68,6 +67,14 @@ public class Player implements Serializable, Cloneable {
      */
     public String getPassword() { return password; }
 
+    /** Getter do xp.
+     *
+     * @return xp.
+     */
+    public Integer getXP() {
+        return xp;
+    }
+
     /**
      * Sinalizar jogador como online
      */
@@ -101,24 +108,30 @@ public class Player implements Serializable, Cloneable {
      *
      * @param gameRank Rank do jogo (0-9).
      * @throws IllegalArgumentException Exceção de ter sido dado como argumento um valor não contido em [0, 9].
+     * @return True caso tenha subido de rank.
      */
-    public void addGame(Integer gameRank) throws IllegalArgumentException, LevelUpException {
+    public boolean addGame(Integer gameRank) throws IllegalArgumentException{
+        boolean upgraded = false;
 
         if(gameRank >= 0 && gameRank <= 9) {
             xp += gameRank;
-            updateRank();
+            upgraded = updateRank();
         }
         else{
             throw new IllegalArgumentException("A função addGame foi evocada com um valor inferior a 0 ou superior a 9");
         }
+
+        return upgraded;
     }
 
 
     /** Verifica se um jogador já tem xp suficiente para avançar para o rank suficiente e, se sim, promove-o.
      *
+     * @return True caso tiver subido de rank.
      */
-    private void updateRank () throws LevelUpException {
+    private boolean updateRank (){
         int xpMin = 0;
+        boolean upgraded = false;
 
         if (rank < 9) {
             for (int i = 0; i <= rank + 1; i++) {
@@ -127,9 +140,11 @@ public class Player implements Serializable, Cloneable {
 
             if (xp >= xpMin) {
                 rank++;
-                throw new LevelUpException(rank);
+                upgraded = true;
             }
         }
+
+        return upgraded;
     }
 
     /**Verifica se as passes entre as duas instâncias de jogador correspondem.

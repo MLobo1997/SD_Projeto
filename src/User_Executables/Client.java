@@ -238,7 +238,7 @@ public class Client {
         inMatch = true;
         try {
             String lineInput = scanner.readLine();
-            while (inMatch || !lineInput.equals("quit")) {
+            while (inMatch || !(lineInput.equals("quit") || lineInput.equals("q"))) {
                 os.println(lineInput);
                 lineInput = scanner.readLine();
             }

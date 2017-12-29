@@ -175,6 +175,38 @@ public class Match implements Runnable {
         }
     }
 
+
+    /** Distribui aleatóriamente o xp aos jogadores.
+     *
+     */
+    private void xpAttribuition() {
+        boolean upgraded;
+
+        LinkedList<ServerThread> players = new LinkedList<>(matchInfo.getPlayers());
+        ArrayList<ServerThread> r = new ArrayList<>(); //Array de posições dos jogadores na posição 0 o jogador recebe 0 de xp, na posição size recebe size xp
+        int playerPos;
+        int i;
+
+        for (i = 0 ; i < size; i++) {
+            playerPos = ThreadLocalRandom.current().nextInt(size - i); //ThreadLocalRandom utilizado em vez de Random por recomendação na própria documentação em 'https://docs.oracle.com/javase/8/docs/api/java/util/Random.html'
+            r.add(i, players.get(playerPos));
+            players.remove(playerPos);
+        }
+
+        for (i = 0 ; i < size ; i++){
+            r.get(i).printToOutput("&xp:" + i + "&"); //envia o valor de xp sobre o formato "&xp:\\d"
+            upgraded = r.get(i).getPlayer().addGame(i);
+            if (upgraded) {
+                r.get(i).printToOutput("1");//diz que houve um upgrade
+            }
+            else {
+                r.get(i).printToOutput("0");//diz que não houve upgrade
+            }
+            r.get(i).printToOutput(r.get(i).getPlayer().getRank().toString());//envia o rank atual
+            r.get(i).printToOutput(r.get(i).getPlayer().getXP().toString());//envia o xp atual
+        }
+    }
+
     public void run() {
 
 
@@ -184,37 +216,17 @@ public class Match implements Runnable {
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 1; i++) {
             echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
-        List<Player> results = defineRanking().stream().map(ServerThread::getPlayer).collect(Collectors.toList());
-        System.out.println("Resultados: " + results);
+
 
         echoMessage("&GAMEOVER&");
 
+        xpAttribuition();
+
         saveGameInfo();
 
-
     }
-
-    /** Distribui aleatóriamente os jogadores de um match por um array, representando os seus rankings no jogo.
-     *
-     * @return Array de rankings.
-     */
-    private ArrayList<ServerThread> defineRanking() {
-
-        LinkedList<ServerThread> players = new LinkedList<>(matchInfo.getPlayers());
-        ArrayList<ServerThread> r = new ArrayList<>();
-        int playerPos;
-
-        for (int i = 0 ; i < size; i++) {
-            playerPos = ThreadLocalRandom.current().nextInt(size - i); //ThreadLocalRandom utilizado em vez de Random por recomendação na própria documentação em 'https://docs.oracle.com/javase/8/docs/api/java/util/Random.html'
-            r.add(i, players.get(playerPos));
-            players.remove(playerPos);
-        }
-
-        return r;
-    }
-
 }

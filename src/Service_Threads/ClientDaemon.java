@@ -1,5 +1,6 @@
 package Service_Threads;
 
+import Game_Information.lobbyBarrier;
 import User_Executables.Client;
 import com.sun.tools.corba.se.idl.StringGen;
 
@@ -40,6 +41,10 @@ public class ClientDaemon implements Runnable {
     @Override
     public  void run() {
         String line = null;
+        String xpString = null;
+        boolean upgraded;
+        Integer xp, rank;
+
         try {
             while (true){
                 line = is.readLine();
@@ -51,10 +56,34 @@ public class ClientDaemon implements Runnable {
                 }
                 else if (line.equals("&GAMEOVER&")) {
                     try {
+                        //BEGIN receção de xp
+                        xpString = is.readLine();
+                        if (xpString.matches("&xp:\\d&")){
+                            xp = Integer.parseInt(xpString.substring(4, 5));
+                            System.out.println("Ficaste em " + (lobbyBarrier.size - xp) + "º lugar. XP: " + xp);
+                        }
+                        else {
+                            throw new Exception("Não foi recebido o código regex suposto 1");
+                        }
+
+                        upgraded = is.readLine().equals("1"); //verifica se houve um upgrade de rank
+                        if(upgraded) {
+                            System.out.println("Subiste de rank!");
+                        }
+
+                        rank = Integer.parseInt(is.readLine());
+                        System.out.println("Rank atual: " + rank);
+                        xp = Integer.parseInt(is.readLine());
+                        System.out.println("XP atual: " + xp);
+                        //END
+
                         os.println(line);
                         client.notInMatch();
                         System.out.println("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
                         break;
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        System.err.println("Não foi recebido um integer como era suposto");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
