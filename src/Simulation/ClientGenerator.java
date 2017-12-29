@@ -3,17 +3,16 @@ package Simulation;
 import com.opencsv.CSVReader;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Classe do programa que gera clientes que atuam aleatóriamente para fins de teste do servidor.
  */
 public class ClientGenerator {
-    /** Número de bots a clientes a serem gerados. */
-    private Integer N;
+    /** Número de bots a correr. */
+    private Integer Nnow;
+    /** Número de bots que correram até agora. */
+    private Integer Ntotal;
     /** Variável para permitir fazer reads de input mais facilmente*/
     private BufferedReader scanner;
     /** Conjunto de threads dos clientes a ser corridos, mapeados por username*/
@@ -28,7 +27,8 @@ public class ClientGenerator {
      */
     private ClientGenerator(){
         scanner = new BufferedReader(new InputStreamReader(System.in));
-        N = initSetN();
+        Nnow    = initSetN();
+        Ntotal  = Nnow;
         threads = new TreeMap<>();
         clients = new TreeMap<>();
         try {
@@ -74,7 +74,7 @@ public class ClientGenerator {
 
         try {
 
-            for (int i = 0 ; i < N && (line = userReader.readNext()) != null ; i++){
+            for (int i = 0 ; i < Nnow && (line = userReader.readNext()) != null ; i++){
                 r.put(line[0], line[1]);
             }
 
@@ -84,6 +84,25 @@ public class ClientGenerator {
 
         return r;
     }
+
+    /** Carrega a informação do jogador seguinte
+     *
+     * @return Array com o username na posição 0 e pass na posição 1.
+     */
+    private ArrayList<String> loadOnePlayerInfo() {
+        String[] line;
+        ArrayList<String> r = new ArrayList<>();
+        try {
+            line = userReader.readNext();
+            r.add(0, line[0]);
+            r.add(1, line[1]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return r;
+    }
+
 
     /**
      * Método de inicialização da variável N, questionando ao utilizador qual o seu valor.
@@ -111,17 +130,26 @@ public class ClientGenerator {
         return n;
     }
 
+    /** Sinaliza um cliente para sair do servidor.
+     *
+     */
     private void removeClient () {
-        Thread t = threads.pollFirstEntry().getValue();
         AutomatedClient c = clients.pollFirstEntry().getValue();
-        N--;
+        Nnow--;
 
         c.signalToLeave();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.println("O cliente " + c.getUsername() + " foi sinalizado para sair");
+    }
+
+    /** Corre mais um cliente.
+     *
+     */
+    private void addClient () {
+        ArrayList<String> info = loadOnePlayerInfo();
+        Ntotal++;
+
+        System.out.println("Vai ser inicializado o utilizador " +  info.get(0));
+        initThread(info.get(0), info.get(1));
     }
 
     private void menu () {
@@ -134,15 +162,15 @@ public class ClientGenerator {
                 cmd = scanner.readLine();
                 switch (cmd) {
                     case "+":
-                        if (N < 1000) {
-
+                        if (Ntotal < 1000) {
+                            addClient();
                         }
                         else {
-                            System.out.println("Já todos os utilizadors foram utilizados.");
+                            System.out.println("Já todos os utilizadores foram utilizados.");
                         }
                         break;
                     case "-":
-                        if (N > 0) {
+                        if (Nnow > 0) {
                             removeClient();
                         }
                         else {
@@ -165,7 +193,7 @@ public class ClientGenerator {
             c.signalToLeave();
         }
 
-        for (Thread t : threads.values()) {
+        for (Thread t : threads.values()) { //Espera por todas as threads que foram corridas ao longo da execução do programa.
             try {
                 t.join();
             } catch (InterruptedException e) {

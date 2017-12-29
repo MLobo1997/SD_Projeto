@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 /**
  * Classe runnable dos cliente gerados automáticamente.
@@ -117,6 +119,7 @@ public class AutomatedClient implements Runnable {
     /**Método que regista e faz login dos users ao sistema.*/
     private void connectUser(){
         startTime = LocalDateTime.now();
+        addLineToLog("-------- " + startTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")) + " --------");
 
         out.println("0"); //dizer ao servidor que é para fazer registo
         tryToRegister();
