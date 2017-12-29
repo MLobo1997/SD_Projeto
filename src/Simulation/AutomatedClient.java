@@ -2,6 +2,8 @@ package Simulation;
 
 import java.io.*;
 import java.net.Socket;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * Classe runnable dos cliente gerados automáticamente.
@@ -21,6 +23,8 @@ public class AutomatedClient implements Runnable {
     private Boolean leave;
     /**Utilizado para gerar a string que no final da execução será registada em ficheiro para demonstrar o output do client automatizado*/
     private StringBuilder log;
+    /** Instante em que foi iniciado o cliente*/
+    private LocalDateTime startTime;
 
     /** Construtor do cliente.
      *
@@ -55,7 +59,7 @@ public class AutomatedClient implements Runnable {
     private void tryToRegister(){
         boolean alreadyExists = false;
 
-        log.append("---A tentar fazer registo.---\n");
+        addLineToLog("---A tentar fazer registo.---");
         out.println(username); //dizer ao servidor o username
         out.println(password);//dizer ao servidor a password
 
@@ -64,11 +68,11 @@ public class AutomatedClient implements Runnable {
             alreadyExists = in.readLine().equals("0");
             if(alreadyExists) {
                 out.println("-1"); //comunica ao servidor que é para saltar para o login
-                log.append("O utilizador já existia.\n");
+                addLineToLog("O utilizador já existia.");
             }
             else {
                 out.println("1"); //confirma ao servidor para finalizar o registo.
-                log.append("O utilizador foi registado com sucesso\n");
+                addLineToLog("O utilizador foi registado com sucesso");
             }
 
         } catch (IOException e) {
@@ -81,7 +85,7 @@ public class AutomatedClient implements Runnable {
      */
     private void loginUser(){
         String str;
-        log.append("---A fazer login---\n");
+        addLineToLog("---A fazer login---");
 
         try {
             out.println(username); //dizer ao servidor o username
@@ -90,18 +94,18 @@ public class AutomatedClient implements Runnable {
             str = in.readLine();
             switch (str) {
                 case "1":
-                    log.append("O utilizador fez o login com sucesso.\n");
+                    addLineToLog("O utilizador fez o login com sucesso.");
                     break;
                 case "0":
-                    log.append("O utilizador não fez o login pois não está registado.\n");
+                    addLineToLog("O utilizador não fez o login pois não está registado.");
                     System.err.println("Tried to login the following user who doesn't exist: " + username);
                     break;
                 case "-1":
-                    log.append("O utilizador não fez o login pois não a password estava incorreta.\n");
+                    addLineToLog("O utilizador não fez o login pois não a password estava incorreta.");
                     System.err.println("Tried to login the following whose password is incorrect: " + username);
                     break;
                 case "-2":
-                    log.append("O utilizador não fez o login já se encontrava online.\n");
+                    addLineToLog("O utilizador não fez o login já se encontrava online.");
                     System.err.println("Tried to login the following who is already online: " + username);
                     break;
             }
@@ -112,6 +116,8 @@ public class AutomatedClient implements Runnable {
 
     /**Método que regista e faz login dos users ao sistema.*/
     private void connectUser(){
+        startTime = LocalDateTime.now();
+
         out.println("0"); //dizer ao servidor que é para fazer registo
         tryToRegister();
         loginUser();
@@ -121,7 +127,7 @@ public class AutomatedClient implements Runnable {
      *
      */
     private void disconnectUser (){
-        log.append("---Utilizador a desconectar---\n");
+        addLineToLog("---Utilizador a desconectar---");
         out.println("0"); //para fazer logout
         printLog();
         try {
@@ -160,16 +166,35 @@ public class AutomatedClient implements Runnable {
      *
      */
     private void play () {
-        log.append("---O utilizador entrou no ciclo de jogos---\n");
+        addLineToLog("---O utilizador entrou no ciclo de jogos---");
 
         while (!leave) {
-            System.out.println(leave);
+            addLineToLog("Um loop");
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /** Coloca a mensagem no log.
+     *
+     * @param line Mensagem.
+     */
+    private void addLineToLog (String line) {
+        Duration dur = Duration.between(startTime, LocalDateTime.now());
+
+        StringBuilder strbld = new StringBuilder();
+
+        strbld.append("[");
+        strbld.append(String.format("%05d", ((Long) dur.getSeconds())));
+        strbld.append(" segundos");
+        strbld.append("]: ");
+        strbld.append(line);
+        strbld.append('\n');
+
+        log.append(strbld);
     }
 
     public void run() {

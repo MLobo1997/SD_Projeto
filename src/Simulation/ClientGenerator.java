@@ -2,10 +2,7 @@ package Simulation;
 
 import com.opencsv.CSVReader;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,9 +17,11 @@ public class ClientGenerator {
     /** Variável para permitir fazer reads de input mais facilmente*/
     private BufferedReader scanner;
     /** Conjunto de threads dos clientes a ser corridos, mapeados por username*/
-    private HashMap<String, Thread> threads;
+    private TreeMap<String, Thread> threads;
     /** Conjunto de clientes a ser corridos, mapeados por username*/
-    private HashMap<String, AutomatedClient> clients;
+    private TreeMap <String, AutomatedClient> clients;
+    /** Leitor de informações de usuário*/
+    private CSVReader userReader;
 
     /**
      * Construtor da classe Simulation.ClientGenerator.
@@ -30,8 +29,13 @@ public class ClientGenerator {
     private ClientGenerator(){
         scanner = new BufferedReader(new InputStreamReader(System.in));
         N = initSetN();
-        threads = new HashMap<>();
-        clients = new HashMap<>();
+        threads = new TreeMap<>();
+        clients = new TreeMap<>();
+        try {
+            userReader = new CSVReader(new FileReader("randomUsers.csv"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         runClients(loadPlayersInfo());
     }
 
@@ -68,11 +72,9 @@ public class ClientGenerator {
         String[] line;
         TreeMap<String, String> r = new TreeMap<>();
 
-        CSVReader reader = null;
         try {
-            reader = new CSVReader(new FileReader("randomUsers.csv"));
 
-            for (int i = 0 ; i < N && (line = reader.readNext()) != null ; i++){
+            for (int i = 0 ; i < N && (line = userReader.readNext()) != null ; i++){
                 r.put(line[0], line[1]);
             }
 
@@ -109,16 +111,46 @@ public class ClientGenerator {
         return n;
     }
 
+    private void removeClient () {
+        Thread t = threads.pollFirstEntry().getValue();
+        AutomatedClient c = clients.pollFirstEntry().getValue();
+        N--;
+
+        c.signalToLeave();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void menu () {
-        System.out.println("[+] para adicionar mais um cliente, [-] para desconectar e [q] para matar o gerador.");
-        char cmd;
+        String cmd;
 
         try {
 
             do {
-                cmd = (char) System.in.read();
-                System.out.println(cmd);
-            } while (cmd != 'q');
+                System.out.println("[+] para adicionar mais um cliente, [-] para desconectar e [q] para matar o gerador.");
+                cmd = scanner.readLine();
+                switch (cmd) {
+                    case "+":
+                        if (N < 1000) {
+
+                        }
+                        else {
+                            System.out.println("Já todos os utilizadors foram utilizados.");
+                        }
+                        break;
+                    case "-":
+                        if (N > 0) {
+                            removeClient();
+                        }
+                        else {
+                            System.out.println("Já não há clientes a correr.");
+                        }
+                        break;
+                }
+            } while (!cmd.equals("q"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,10 +161,13 @@ public class ClientGenerator {
      *
      */
     private void killAllClients () {
-        for(AutomatedClient c : clients.values()){
+        for (AutomatedClient c : clients.values()){
+            c.signalToLeave();
+        }
+
+        for (Thread t : threads.values()) {
             try {
-                c.signalToLeave();
-                threads.get(c.getUsername()).join();
+                t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
