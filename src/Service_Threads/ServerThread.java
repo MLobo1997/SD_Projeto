@@ -252,6 +252,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     // Possuimos um Game_Information.Player
                     // Possuimos um Service_Threads.Match
                     initGame();
+                    allPlayers.savePlayersInfo(); //Atualiza os xp's em memória
 
                 }
             } while (!cmd.equals("0")); // cmd = 0 quando quer fazer logout

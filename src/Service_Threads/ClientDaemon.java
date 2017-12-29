@@ -38,12 +38,40 @@ public class ClientDaemon implements Runnable {
         client = c;
     }
 
+    /** Recebe e processa informações de xp do jogo
+     *
+     * @throws Exception Para o readline
+     */
+    private void xpHandler() throws Exception {
+        String xpString;
+        Integer xp, rank;
+        Boolean upgraded;
+
+        //BEGIN receção de xp
+        xpString = is.readLine();
+        if (xpString.matches("&xp:\\d&")){
+            xp = Integer.parseInt(xpString.substring(4, 5));
+            System.out.println("Ficaste em " + (lobbyBarrier.size - xp) + "º lugar. XP: " + xp);
+        }
+        else {
+            throw new Exception("Não foi recebido o código regex suposto 1");
+        }
+
+        upgraded = is.readLine().equals("1"); //verifica se houve um upgrade de rank
+        if(upgraded) {
+            System.out.println("Subiste de rank!");
+        }
+
+        rank = Integer.parseInt(is.readLine());
+        System.out.println("Rank atual: " + rank);
+        xp = Integer.parseInt(is.readLine());
+        System.out.println("XP atual: " + xp);
+        //END
+    }
+
     @Override
     public  void run() {
         String line = null;
-        String xpString = null;
-        boolean upgraded;
-        Integer xp, rank;
 
         try {
             while (true){
@@ -56,26 +84,7 @@ public class ClientDaemon implements Runnable {
                 }
                 else if (line.equals("&GAMEOVER&")) {
                     try {
-                        //BEGIN receção de xp
-                        xpString = is.readLine();
-                        if (xpString.matches("&xp:\\d&")){
-                            xp = Integer.parseInt(xpString.substring(4, 5));
-                            System.out.println("Ficaste em " + (lobbyBarrier.size - xp) + "º lugar. XP: " + xp);
-                        }
-                        else {
-                            throw new Exception("Não foi recebido o código regex suposto 1");
-                        }
-
-                        upgraded = is.readLine().equals("1"); //verifica se houve um upgrade de rank
-                        if(upgraded) {
-                            System.out.println("Subiste de rank!");
-                        }
-
-                        rank = Integer.parseInt(is.readLine());
-                        System.out.println("Rank atual: " + rank);
-                        xp = Integer.parseInt(is.readLine());
-                        System.out.println("XP atual: " + xp);
-                        //END
+                        xpHandler(); //Recebe e processa informações de xp do jogo
 
                         os.println(line);
                         client.notInMatch();

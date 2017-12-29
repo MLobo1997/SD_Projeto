@@ -234,3 +234,27 @@
 | name:3,rank:1,hero:n/a | 
 | name:2,rank:0,hero:n/a | name:1,rank:1,hero:n/a | 
 ----
+15:09:14
+| name:1,rank:1,hero:n/a | 
+| name:2,rank:0,hero:n/a | name:3,rank:1,hero:n/a | 
+----
+15:09:41
+| name:1,rank:1,hero:n/a | 
+| name:2,rank:0,hero:n/a | name:3,rank:1,hero:n/a | 
+----
+15:10:00
+| name:1,rank:1,hero:n/a | 
+| name:2,rank:1,hero:n/a | name:3,rank:1,hero:n/a | 
+----
+15:11:13
+| name:2,rank:1,hero:n/a | 
+| name:1,rank:1,hero:n/a | name:3,rank:1,hero:n/a | 
+----
+15:19:03
+| name:2,rank:1,hero:n/a | 
+| name:1,rank:1,hero:n/a | name:3,rank:1,hero:n/a | 
+----
+15:19:42
+| name:2,rank:1,hero:n/a | 
+| name:1,rank:1,hero:n/a | name:3,rank:1,hero:n/a | 
+----
