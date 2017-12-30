@@ -63,6 +63,7 @@ public class ClientGenerator {
         t.start();
     }
 
+
     /**
      * Método utilizado para fazer parse da informação dos jogadores guardada num ficheiro csv.
      *
@@ -147,6 +148,7 @@ public class ClientGenerator {
     private void addClient () {
         ArrayList<String> info = loadOnePlayerInfo();
         Ntotal++;
+        Nnow++;
 
         System.out.println("Vai ser inicializado o utilizador " +  info.get(0));
         initThread(info.get(0), info.get(1));

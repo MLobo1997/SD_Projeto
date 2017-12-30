@@ -258,3 +258,51 @@
 | name:2,rank:1,hero:n/a | 
 | name:1,rank:1,hero:n/a | name:3,rank:1,hero:n/a | 
 ----
+01:35:58
+| name:mdiggar0,rank:0,hero:n/a | 
+| name:landrasch1,rank:0,hero:n/a | name:dlightwing2,rank:0,hero:n/a | 
+----
+01:42:03
+| name:mdiggar0,rank:0,hero:n/a | 
+| name:1,rank:0,hero:n/a | name:landrasch1,rank:0,hero:n/a | 
+----
+01:49:02
+| name:mdiggar0,rank:0,hero:n/a | 
+| name:landrasch1,rank:0,hero:n/a | name:dlightwing2,rank:0,hero:n/a | 
+----
+13:13:46
+| name:2,rank:0,hero:n/a | 
+| name:1,rank:0,hero:n/a | name:3,rank:0,hero:n/a | 
+----
+13:14:12
+| name:1,rank:0,hero:n/a | 
+| name:2,rank:0,hero:n/a | name:3,rank:0,hero:n/a | 
+----
+13:21:52
+| name:mdiggar0,rank:0,hero:n/a | 
+| name:landrasch1,rank:0,hero:n/a | name:dlightwing2,rank:0,hero:n/a | 
+----
+13:22:07
+| name:dlightwing2,rank:0,hero:n/a | 
+| name:landrasch1,rank:0,hero:n/a | name:mdiggar0,rank:0,hero:n/a | 
+----
+13:22:16
+| name:mdiggar0,rank:0,hero:n/a | 
+| name:dlightwing2,rank:0,hero:n/a | name:landrasch1,rank:0,hero:n/a | 
+----
+13:29:51
+| name:cdelle5,rank:0,hero:n/a | name:landrasch1,rank:0,hero:n/a | name:dlightwing2,rank:0,hero:n/a | name:bcometson9,rank:0,hero:n/a | name:imarke3,rank:1,hero:n/a | 
+| name:fstocky8,rank:0,hero:n/a | name:mdiggar0,rank:0,hero:n/a | name:ashapera4,rank:0,hero:n/a | name:ckirwood7,rank:0,hero:n/a | name:ileel6,rank:0,hero:n/a | 
+----
+13:30:04
+| name:ashapera4,rank:0,hero:n/a | name:bcometson9,rank:1,hero:n/a | name:mdiggar0,rank:1,hero:n/a | name:dlightwing2,rank:1,hero:n/a | name:imarke3,rank:1,hero:n/a | 
+| name:fstocky8,rank:1,hero:n/a | name:landrasch1,rank:0,hero:n/a | name:ileel6,rank:1,hero:n/a | name:ckirwood7,rank:1,hero:n/a | name:cdelle5,rank:1,hero:n/a | 
+----
+13:30:42
+| name:1,rank:1,hero:n/a | name:ileel6,rank:1,hero:n/a | name:cdelle5,rank:1,hero:n/a | name:mdiggar0,rank:1,hero:n/a | name:dlightwing2,rank:1,hero:n/a | 
+| name:landrasch1,rank:1,hero:n/a | name:ckirwood7,rank:1,hero:n/a | name:bcometson9,rank:1,hero:n/a | name:imarke3,rank:1,hero:n/a | name:fstocky8,rank:1,hero:n/a | 
+----
+13:31:18
+| name:imarke3,rank:1,hero:n/a | name:mdiggar0,rank:1,hero:n/a | name:cdelle5,rank:2,hero:n/a | name:landrasch1,rank:1,hero:n/a | name:1,rank:1,hero:n/a | 
+| name:fstocky8,rank:1,hero:n/a | name:ileel6,rank:1,hero:n/a | name:ckirwood7,rank:1,hero:n/a | name:bcometson9,rank:1,hero:n/a | name:dlightwing2,rank:1,hero:n/a | 
+----

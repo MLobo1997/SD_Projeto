@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Classe runnable dos cliente gerados automáticamente.
@@ -27,6 +27,8 @@ public class AutomatedClient implements Runnable {
     private StringBuilder log;
     /** Instante em que foi iniciado o cliente*/
     private LocalDateTime startTime;
+    /**Identifica se o cliente se encontra no processo de matching.*/
+    private boolean inMatch;
 
     /** Construtor do cliente.
      *
@@ -53,6 +55,34 @@ public class AutomatedClient implements Runnable {
      */
     public String getUsername() {
         return username;
+    }
+
+    /** Faz uma espera de tempo aleatório com limite.
+     *
+     * @param maxSeconds Limite, em segundos.
+     */
+    public static void waitUntil (int maxSeconds) {
+        int waitTime = (int) (ThreadLocalRandom.current().nextDouble(maxSeconds) * 1000);
+
+        try {
+            Thread.sleep(waitTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /** Modifica o cliente para um estado de fora de matching.
+     *
+     * @throws Exception No caso de se tentar usar o método quando não se encontra em matching.
+     */
+    void notInMatch() throws Exception{
+        if (inMatch) {
+            inMatch = false;
+        }
+        else {
+            throw new Exception("Foi invocado o método notInMatch quando o cliente não estava em match");
+        }
     }
 
     /** Tenta realizar o registo de um jogador automatizado. TODO:Adicionar capacidade de no caso de já estar registado saltar para o login
@@ -161,8 +191,24 @@ public class AutomatedClient implements Runnable {
         }
     }
 
+    /** Notifica o cliente que tem de se desconectar.
+     *
+     */
     void signalToLeave() {
         leave = true;
+    }
+
+    /**
+     *
+     */
+    private void findMatch() {
+        addLineToLog("---Iniciou a procura de um jogo---");
+        inMatch = true;
+
+        while (inMatch) {
+            waitUntil(10);
+            out.println("Lorem ipsum dolor sit amet");
+        }
     }
 
     /** Coloca o cliente num ciclo de jogos.
@@ -170,13 +216,27 @@ public class AutomatedClient implements Runnable {
      */
     private void play () {
         addLineToLog("---O utilizador entrou no ciclo de jogos---");
+        Thread t;
 
-        while (!leave) {
-            addLineToLog("Um loop");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        while (true) {
+            if (leave) {
+                addLineToLog("A sair do modo de procura de jogo");
+                out.println("0");
+                break;
+            }
+            else {
+                //Cria o daemon igual ao do cliente normal
+                t = new Thread(new AutomatedClientDaemon(socket, this));
+                t.start();
+
+                out.println("1");
+                findMatch();
+
+                try {
+                    t.join(); //Espera que morra (supostamente não necessário, mas está aqui para termos a certeza que acontece
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -185,13 +245,13 @@ public class AutomatedClient implements Runnable {
      *
      * @param line Mensagem.
      */
-    private void addLineToLog (String line) {
+    void addLineToLog (String line) {
         Duration dur = Duration.between(startTime, LocalDateTime.now());
 
         StringBuilder strbld = new StringBuilder();
 
         strbld.append("[");
-        strbld.append(String.format("%05d", ((Long) dur.getSeconds())));
+        strbld.append(String.format("%03d", ((Long) dur.getSeconds())));
         strbld.append(" segundos");
         strbld.append("]: ");
         strbld.append(line);

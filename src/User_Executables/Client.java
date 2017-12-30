@@ -290,6 +290,7 @@ public class Client {
     private void init(){
         int cmd;
         ClientDaemon daemon;
+        Thread t;
 
         do {
             cmd = startMenu();
@@ -298,10 +299,16 @@ public class Client {
                 System.out.println("À procura de jogo...");
                 // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
                 daemon = new ClientDaemon(socket, this);
-                new Thread(daemon).start();
+                t = new Thread(daemon);
+                t.start();
 
                 findMatch();
 
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } while (cmd != 0);
         disconnectUser();
