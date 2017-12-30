@@ -1,4 +1,4 @@
-package Service_Threads;
+package Simulation;
 
 import Game_Information.lobbyBarrier;
 import User_Executables.Client;
@@ -9,22 +9,22 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/**
- * Classe utilizada para a thread de Cliente que funciona como um listener dos dados que lhe são enviados
- * e re-direciona para o terminal do utilizador
- */
-public class ClientDaemon implements Runnable {
+public class AutomatedClientDaemon implements Runnable{
+    /**
+     * Classe utilizada para a thread de Cliente automatizado que funciona como um listener dos dados que lhe são enviados
+     * e re-direciona para o terminal do utilizador
+     */
     private BufferedReader is = null;
     private PrintWriter os = null;
     private Socket socket = null;
     /**Para poder manipular o cliente*/
-    private Client client = null;
+    private AutomatedClient client  = null;
 
     /**
      * Constructor
      * @param s Socket que o cliente utiliza para comunicar com o servidor
      */
-    public ClientDaemon(Socket s, Client c) {
+    public AutomatedClientDaemon(Socket s, AutomatedClient c) {
         socket = s;
 
         try {
@@ -50,7 +50,7 @@ public class ClientDaemon implements Runnable {
         xpString = is.readLine();
         if (xpString.matches("&xp:\\d&")){
             xp = Integer.parseInt(xpString.substring(4, 5));
-            System.out.println("Ficaste em " + (lobbyBarrier.size - xp) + "º lugar. XP: " + xp);
+            client.addLineToLog("Ficaste em " + (lobbyBarrier.size - xp) + "º lugar. XP: " + xp);
         }
         else {
             throw new Exception("Não foi recebido o código regex suposto 1");
@@ -58,13 +58,13 @@ public class ClientDaemon implements Runnable {
 
         upgraded = is.readLine().equals("1"); //verifica se houve um upgrade de rank
         if(upgraded) {
-            System.out.println("Subiste de rank!");
+            client.addLineToLog("Subiste de rank!");
         }
 
         rank = Integer.parseInt(is.readLine());
-        System.out.println("Rank atual: " + rank);
+        client.addLineToLog("Rank atual: " + rank);
         xp = Integer.parseInt(is.readLine());
-        System.out.println("XP atual: " + xp);
+        client.addLineToLog("XP atual: " + xp);
         //END
     }
 
@@ -76,12 +76,7 @@ public class ClientDaemon implements Runnable {
             while (true){
                 line = is.readLine();
                 if (line == null) {
-                    try {
-                        System.out.println("Ligação com o servidor perdida.");
-                        client.notInMatch();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    client.addLineToLog("Ligação com o servidor perdida.");
                     break;
                 }
                 else if (line.equals("&GAMEOVER&")) {
@@ -90,23 +85,23 @@ public class ClientDaemon implements Runnable {
 
                         os.println(line);
                         client.notInMatch();
-                        System.out.println("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
+                        client.addLineToLog("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
                         break;
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
-                        System.err.println("Não foi recebido um integer como era suposto");
+                        client.addLineToLog("Não foi recebido um integer como era suposto");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 else {
-                    System.out.println(line);
+                    client.addLineToLog(line);
                 }
             }
         }
         catch (IOException | NullPointerException e) {
-            System.out.println("Ligação com o servidor perdida.");
+            client.addLineToLog("Ligação com o servidor perdida.");
         }
+        client.addLineToLog("A daemon morreu.");
     }
 }
-

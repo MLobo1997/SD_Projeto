@@ -17,8 +17,8 @@ public class Client {
     private BufferedReader is      = null;
     /** PrintWriter gerado do socket */
     private PrintWriter os         = null;
-
-    private ClientDaemon daemon;
+    /**Identifica se o cliente se encontra no processo de matching.*/
+    private boolean inMatch;
 
     /**
      * Constructor
@@ -29,6 +29,7 @@ public class Client {
             socket  = new Socket("127.0.0.1",9999);
             is      = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             os      = new PrintWriter(socket.getOutputStream(),true);
+            inMatch = false;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,7 +38,6 @@ public class Client {
     /**
      * Faz o registo e/ou login de um utilizador ao sistema.
      *
-     * @return Informação do jogador.
      */
     private void connectUser(){
         boolean loggedIn = false;
@@ -141,7 +141,7 @@ public class Client {
                         tmp = scanner.readLine();
                         if (tmp.equals("y")) {
                             check = true;
-                            os.println("1"); //transmite o 'yes' TODO UTILIZAR YESORNO
+                            os.println("1"); //transmite o 'yes' TODO UTILIZAR CheckIfSkip
                         } else if (tmp.equals("n")) {
                             os.println("0"); //transmite o 'no'
                         }
@@ -235,10 +235,10 @@ public class Client {
      * Ler informação do cliente necessária para inicializar jogo
      */
     private void findMatch() {
-        System.out.println("Estamos a procura de um jogo... [quit]"); //TODO se fizemos quit enquanto procura um jogo escacha tudo
+        inMatch = true;
         try {
             String lineInput = scanner.readLine();
-            while (!lineInput.equals("quit")) {
+            while (inMatch || !(lineInput.equals("quit") || lineInput.equals("q"))) {
                 os.println(lineInput);
                 lineInput = scanner.readLine();
             }
@@ -260,7 +260,7 @@ public class Client {
         try {
 
             do {
-                System.out.println("O que vosse mecê deseja fazer?");
+                System.out.println("O que queres fazer?");
                 System.out.println("Jogar [p], sair [q]?:");
 
                 cmd = scanner.readLine();
@@ -289,24 +289,45 @@ public class Client {
      */
     private void init(){
         int cmd;
-
-        // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
-        daemon = new ClientDaemon(socket);
-        new Thread(daemon).start();
+        ClientDaemon daemon;
+        Thread t;
 
         do {
             cmd = startMenu();
 
             if (cmd == 1){
+                System.out.println("À procura de jogo...");
+                // Criar daemon thread que faz redireciona qualquer mensagem deste cliente para o seu input (listener)
+                daemon = new ClientDaemon(socket, this);
+                t = new Thread(daemon);
+                t.start();
+
                 findMatch();
+
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } while (cmd != 0);
         disconnectUser();
     }
 
-    public static void main(String args[]){
-        int cmd;
+    /** Modifica o cliente para um estado de fora de matching.
+     *
+     * @throws Exception No caso de se tentar usar o método quando não se encontra em matching.
+     */
+    public void notInMatch() throws Exception{
+        if (inMatch) {
+            inMatch = false;
+        }
+        else {
+            throw new Exception("Foi invocado o método notInMatch quando o cliente não estava em match");
+        }
+    }
 
+    public static void main(String args[]){
 
         Client client = new Client();
 
@@ -314,7 +335,6 @@ public class Client {
 
         client.init();
 
-        client.daemon.signalKill();
 
         System.exit(0);
 

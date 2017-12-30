@@ -1,13 +1,21 @@
 package Service_Threads;
 
 import Game_Information.MatchInfo;
+import Game_Information.Player;
+import Game_Information.lobbyBarrier;
+import User_Executables.Server;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TreeSet;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Match implements Runnable {
     /**
@@ -27,6 +35,8 @@ public class Match implements Runnable {
      * Condição: Já todas as threads dos jogadores estão acordadas?
      */
     private Condition allPlayersReady;
+    /** Número de jogadores por match*/
+    static final int size = lobbyBarrier.size;
 
     /**
      * Construtor
@@ -165,6 +175,38 @@ public class Match implements Runnable {
         }
     }
 
+
+    /** Distribui aleatóriamente o xp aos jogadores.
+     *
+     */
+    private void xpAttribuition() {
+        boolean upgraded;
+
+        LinkedList<ServerThread> players = new LinkedList<>(matchInfo.getPlayers());
+        ArrayList<ServerThread> r = new ArrayList<>(); //Array de posições dos jogadores na posição 0 o jogador recebe 0 de xp, na posição size recebe size xp
+        int playerPos;
+        int i;
+
+        for (i = 0 ; i < size; i++) {
+            playerPos = ThreadLocalRandom.current().nextInt(size - i); //ThreadLocalRandom utilizado em vez de Random por recomendação na própria documentação em 'https://docs.oracle.com/javase/8/docs/api/java/util/Random.html'
+            r.add(i, players.get(playerPos));
+            players.remove(playerPos);
+        }
+
+        for (i = 0 ; i < size ; i++){
+            r.get(i).printToOutput("&xp:" + i + "&"); //envia o valor de xp sobre o formato "&xp:\\d"
+            upgraded = r.get(i).getPlayer().addGame(i);
+            if (upgraded) {
+                r.get(i).printToOutput("1");//diz que houve um upgrade
+            }
+            else {
+                r.get(i).printToOutput("0");//diz que não houve upgrade
+            }
+            r.get(i).printToOutput(r.get(i).getPlayer().getRank().toString());//envia o rank atual
+            r.get(i).printToOutput(r.get(i).getPlayer().getXP().toString());//envia o xp atual
+        }
+    }
+
     public void run() {
 
 
@@ -179,11 +221,12 @@ public class Match implements Runnable {
             waitFor(5);
         }
 
+
         echoMessage("&GAMEOVER&");
-        echoMessage("Jogo acabou, escreva \"quit\" para voltar ao menu principal");
+
+        xpAttribuition();
 
         saveGameInfo();
-
 
     }
 }

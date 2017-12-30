@@ -236,7 +236,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
     /**
      * Método chamado após o login do jogador com o ituito de comunicar  com o mesmo e responder às suas decisões (como jogar, sair, etc.)
      */
-    public void commandMode() {
+    private void commandMode() {
         String cmd = null;
 
         try {
@@ -252,19 +252,20 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     // Possuimos um Game_Information.Player
                     // Possuimos um Service_Threads.Match
                     initGame();
+                    allPlayers.savePlayersInfo(); //Atualiza os xp's em memória
+
                 }
             } while (!cmd.equals("0")); // cmd = 0 quando quer fazer logout
             cleanup();
 
         } catch (NullPointerException | IOException e) {
+            e.printStackTrace();
             cleanup();
         }
     }
 
     /**
      * Protocolo de especificação de intenções do cliente pré-jogo (registar ou fazer login)
-     *
-     * @throws IOException No caso de não conseguir ler do buffer do cliente.
      */
     public void connectUser() {
         boolean toReg = true; //true se for para fazer registo false se for para fazer login
@@ -329,13 +330,16 @@ public class ServerThread implements Comparable, Runnable, Observer {
 
         currentMatch.getMatchLock().lock();
 
-        currentMatch.incrementPlayersReady();
+        try {
+            currentMatch.incrementPlayersReady();
 
-        if  (currentMatch.getThreadsAwoken() == playerNum) {
-            currentMatch.getAllPlayersReadyCondition().signal();
+            if (currentMatch.getThreadsAwoken() == playerNum) {
+                currentMatch.getAllPlayersReadyCondition().signal();
+            }
         }
-
-        currentMatch.getMatchLock().unlock();
+        finally {
+            currentMatch.getMatchLock().unlock();
+        }
 
     }
 
@@ -351,7 +355,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
      * Inicializar o protocolo de comunicação para jogo. Neste método, todas as linhas lidas do jogador
      * são interpretadas como mensagens de chat ou comandos de jogo
      */
-    public void initGame() {
+    private void initGame() {
 
         signalReady();
 
@@ -359,7 +363,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
             // Mensagem de input
             String str = in.readLine();
 
-            while((str != null) && !(str.equals("quit") || str.equals("&GAMEOVER&"))) {
+            while((str != null) && !str.equals("&GAMEOVER&")) {
                 if(str.matches("&CHOOSE [12]?[0-9]&")){
                     int hero = Integer.parseInt(str.replaceAll("[\\D]", ""));
                     boolean res = currentMatch.chooseHero(this, hero);

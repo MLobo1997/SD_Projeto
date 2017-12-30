@@ -2,32 +2,40 @@ package Simulation;
 
 import com.opencsv.CSVReader;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 
 /**
  * Classe do programa que gera clientes que atuam aleatóriamente para fins de teste do servidor.
  */
 public class ClientGenerator {
-    /** Número de bots a clientes a serem gerados. */
-    private Integer N;
+    /** Número de bots a correr. */
+    private Integer Nnow;
+    /** Número de bots que correram até agora. */
+    private Integer Ntotal;
     /** Variável para permitir fazer reads de input mais facilmente*/
     private BufferedReader scanner;
-    /** Conjunto de threads dos clientes a ser corridos*/
-    private HashSet<Thread> clients;
+    /** Conjunto de threads dos clientes a ser corridos, mapeados por username*/
+    private TreeMap<String, Thread> threads;
+    /** Conjunto de clientes a ser corridos, mapeados por username*/
+    private TreeMap <String, AutomatedClient> clients;
+    /** Leitor de informações de usuário*/
+    private CSVReader userReader;
 
     /**
      * Construtor da classe Simulation.ClientGenerator.
      */
     private ClientGenerator(){
         scanner = new BufferedReader(new InputStreamReader(System.in));
-        N = initSetN();
-        clients = new HashSet<>();
+        Nnow    = initSetN();
+        Ntotal  = Nnow;
+        threads = new TreeMap<>();
+        clients = new TreeMap<>();
+        try {
+            userReader = new CSVReader(new FileReader("randomUsers.csv"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         runClients(loadPlayersInfo());
     }
 
@@ -50,9 +58,11 @@ public class ClientGenerator {
     private void initThread(String user, String pass){
         AutomatedClient c = new AutomatedClient(user, pass);
         Thread t = new Thread(c);
-        clients.add(t);
-        t.run();
+        threads.put(user, t);
+        clients.put(user, c);
+        t.start();
     }
+
 
     /**
      * Método utilizado para fazer parse da informação dos jogadores guardada num ficheiro csv.
@@ -63,11 +73,9 @@ public class ClientGenerator {
         String[] line;
         TreeMap<String, String> r = new TreeMap<>();
 
-        CSVReader reader = null;
         try {
-            reader = new CSVReader(new FileReader("randomUsers.csv"));
 
-            for (int i = 0 ; i < N && (line = reader.readNext()) != null ; i++){
+            for (int i = 0 ; i < Nnow && (line = userReader.readNext()) != null ; i++){
                 r.put(line[0], line[1]);
             }
 
@@ -77,6 +85,25 @@ public class ClientGenerator {
 
         return r;
     }
+
+    /** Carrega a informação do jogador seguinte
+     *
+     * @return Array com o username na posição 0 e pass na posição 1.
+     */
+    private ArrayList<String> loadOnePlayerInfo() {
+        String[] line;
+        ArrayList<String> r = new ArrayList<>();
+        try {
+            line = userReader.readNext();
+            r.add(0, line[0]);
+            r.add(1, line[1]);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return r;
+    }
+
 
     /**
      * Método de inicialização da variável N, questionando ao utilizador qual o seu valor.
@@ -104,15 +131,84 @@ public class ClientGenerator {
         return n;
     }
 
-    public static void main (String [] args){
-        ClientGenerator cg = new ClientGenerator();
+    /** Sinaliza um cliente para sair do servidor.
+     *
+     */
+    private void removeClient () {
+        AutomatedClient c = clients.pollFirstEntry().getValue();
+        Nnow--;
 
-        for(Thread t : cg.clients){
+        c.signalToLeave();
+        System.out.println("O cliente " + c.getUsername() + " foi sinalizado para sair");
+    }
+
+    /** Corre mais um cliente.
+     *
+     */
+    private void addClient () {
+        ArrayList<String> info = loadOnePlayerInfo();
+        Ntotal++;
+        Nnow++;
+
+        System.out.println("Vai ser inicializado o utilizador " +  info.get(0));
+        initThread(info.get(0), info.get(1));
+    }
+
+    private void menu () {
+        String cmd;
+
+        try {
+
+            do {
+                System.out.println("[+] para adicionar mais um cliente, [-] para desconectar e [q] para matar o gerador.");
+                cmd = scanner.readLine();
+                switch (cmd) {
+                    case "+":
+                        if (Ntotal < 1000) {
+                            addClient();
+                        }
+                        else {
+                            System.out.println("Já todos os utilizadores foram utilizados.");
+                        }
+                        break;
+                    case "-":
+                        if (Nnow > 0) {
+                            removeClient();
+                        }
+                        else {
+                            System.out.println("Já não há clientes a correr.");
+                        }
+                        break;
+                }
+            } while (!cmd.equals("q"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("A sair.");
+    }
+
+    /** Mata e espera que morram todos os clientes.
+     *
+     */
+    private void killAllClients () {
+        for (AutomatedClient c : clients.values()){
+            c.signalToLeave();
+        }
+
+        for (Thread t : threads.values()) { //Espera por todas as threads que foram corridas ao longo da execução do programa.
             try {
                 t.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void main (String [] args){
+        ClientGenerator cg = new ClientGenerator();
+
+        cg.menu();
+
+        cg.killAllClients();
     }
 }

@@ -23,7 +23,7 @@ public class lobbyBarrier {
     /** Número de ranks */
     private static final int rankNum = 10;
     /** Número de jogadores por jogo.*/
-    private static final int size = 3; // TODO: Valor temporário, mudar
+    public static final int size = 10;
     ///** Coleção de threads dedicadas a jogadores.*/
     //private HashSet<ServerThread> players;
     /** Lock associado à condição do lobby i */
@@ -130,7 +130,7 @@ public class lobbyBarrier {
      * @param matchThreads Server threads dos jogador que se vão entrar no match.
      */
     private void startMatch(TreeSet<ServerThread> matchThreads){
-        System.out.println("A iniciar um jogo.");
+        System.out.println("A iniciar um match.");
         Match match = new Match(matchThreads, size, new ReentrantLock());
         informThreadsOfAddedMatch(matchThreads, match);
 
