@@ -58,3 +58,19 @@
 | name:carlos,rank:0,hero:n/a | 
 | name:diogo,rank:0,hero:25 | name:edgar,rank:0,hero:n/a | 
 ----
+16:15:25
+| name:carlos,rank:0,hero:n/a | 
+| name:edgar,rank:0,hero:n/a | name:patricia,rank:0,hero:n/a | 
+----
+16:26:48
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | name:d,rank:0,hero:n/a | 
+----
+16:27:57
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | name:c,rank:0,hero:n/a | 
+----
+16:28:01
+| name:e,rank:0,hero:n/a | 
+| name:d,rank:0,hero:n/a | name:f,rank:0,hero:n/a | 
+----
