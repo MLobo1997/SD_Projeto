@@ -216,7 +216,7 @@ public class Match implements Runnable {
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 6; i++) {
             echoMessage(i * 5 + " segundos passaram.");
             waitFor(5);
         }
