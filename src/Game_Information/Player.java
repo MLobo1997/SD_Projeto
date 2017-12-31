@@ -84,9 +84,11 @@ public class Player implements Serializable, Cloneable {
 
     /**
      * Sinalizar jogador como offline
+     * @return O jogador offline.
      */
-    public void goOffline() {
+    public Player goOffline() {
         online = false;
+        return this;
     }
 
     /**

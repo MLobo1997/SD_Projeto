@@ -78,7 +78,7 @@ public class ClientDaemon implements Runnable {
                 if (line == null) {
                     try {
                         System.out.println("Ligação com o servidor perdida.");
-                        client.notInMatch();
+                        client.matchEnded();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -89,12 +89,19 @@ public class ClientDaemon implements Runnable {
                         xpHandler(); //Recebe e processa informações de xp do jogo
 
                         os.println(line);
-                        client.notInMatch();
+                        client.matchEnded();
                         System.out.println("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
                         break;
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                         System.err.println("Não foi recebido um integer como era suposto");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if (line.equals("&FOUNDGAME&")) {
+                    try {
+                        client.foundMatch();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
