@@ -21,7 +21,7 @@ public class lobbyBarrier {
     /** Número de ranks */
     private static final int rankNum = 10;
     /** Número de jogadores por jogo.*/
-    public static final int size = 10;
+    public static final int size = 2;
     ///** Coleção de threads dedicadas a jogadores.*/
     //private HashSet<ServerThread> players;
     /** Lock associado à condição do lobby i */

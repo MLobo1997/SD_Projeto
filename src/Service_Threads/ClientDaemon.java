@@ -84,7 +84,7 @@ public class ClientDaemon implements Runnable {
                     }
                     break;
                 }
-                else if (line.equals("&GAMEOVER&")) {
+                else if (line.equals("&GAMEOVER 1&")) {
                     try {
                         xpHandler(); //Recebe e processa informações de xp do jogo
 
@@ -95,6 +95,16 @@ public class ClientDaemon implements Runnable {
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                         System.err.println("Não foi recebido um integer como era suposto");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if (line.equals("&GAMEOVER 0&")) {
+                    try {
+                        os.println(line);
+                        client.matchEnded();
+                        System.out.println("O jogo terminou abruptamente(pelo menos um cliente perdeu ligacao). Escrever \"quit\" para voltar ao menu.");
+                        break;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

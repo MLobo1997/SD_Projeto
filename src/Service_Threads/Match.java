@@ -35,7 +35,9 @@ public class Match implements Runnable {
      * Condição: Já todas as threads dos jogadores estão acordadas?
      */
     private Condition allPlayersReady;
-    /** Número de jogadores por match*/
+    /**
+     * Número de jogadores por match
+     */
     static final int size = lobbyBarrier.size;
 
     /**
@@ -164,7 +166,7 @@ public class Match implements Runnable {
             writer.append(matchInfo.getPlayersTeamOne() + "\n");
             writer.append(matchInfo.getPlayersTeamTwo() + "\n");
             writer.append("----\n");
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
@@ -176,8 +178,8 @@ public class Match implements Runnable {
     }
 
 
-    /** Distribui aleatóriamente o xp aos jogadores.
-     *
+    /**
+     * Distribui aleatóriamente o xp aos jogadores.
      */
     private void xpAttribuition() {
         boolean upgraded;
@@ -187,19 +189,18 @@ public class Match implements Runnable {
         int playerPos;
         int i;
 
-        for (i = 0 ; i < size; i++) {
+        for (i = 0; i < size; i++) {
             playerPos = ThreadLocalRandom.current().nextInt(size - i); //ThreadLocalRandom utilizado em vez de Random por recomendação na própria documentação em 'https://docs.oracle.com/javase/8/docs/api/java/util/Random.html'
             r.add(i, players.get(playerPos));
             players.remove(playerPos);
         }
 
-        for (i = 0 ; i < size ; i++){
+        for (i = 0; i < size; i++) {
             r.get(i).printToOutput("&xp:" + i + "&"); //envia o valor de xp sobre o formato "&xp:\\d"
             upgraded = r.get(i).getPlayer().addGame(i);
             if (upgraded) {
                 r.get(i).printToOutput("1");//diz que houve um upgrade
-            }
-            else {
+            } else {
                 r.get(i).printToOutput("0");//diz que não houve upgrade
             }
             r.get(i).printToOutput(r.get(i).getPlayer().getRank().toString());//envia o rank atual
@@ -212,34 +213,43 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
-        echoMessage("&FOUNDGAME&");
+        echoMessage("&FOUNDGAME&"); //notifica os clientes que encontraram um jogo
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
         echoMessage("Escolha um heroi! (/c[0-30])");
 
+        String offlinePlayer = null;
+
         for (int i = 0; i < 6; i++) {
             echoMessage(i * 5 + " segundos passaram.");
+            if ( (offlinePlayer = allPlayersOnline()) != null) {
+                echoMessage("Jogador '" + offlinePlayer + "' desconectado. Terminando o jogo.");
+                echoMessage("&GAMEOVER 0&");
+                return;
+            }
             waitFor(5);
         }
 
 
-        echoMessage("&GAMEOVER&");
+        echoMessage("&GAMEOVER 1&");
 
         xpAttribuition();
 
         saveGameInfo();
-
     }
 
-    private boolean allPlayersOnline() {
-
+    /**
+     * Verifica se todos os jogadores no jogo estao online
+     * @return nome do primeiro jogador offline que encontra, null se nao encontra nada
+     */
+    private String allPlayersOnline() {
         for (ServerThread st : matchInfo.getPlayers()) {
             if (!st.getPlayer().isOnline()) {
-                return false;
+                return st.getPlayer().getUsername();
             }
         }
 
-        return true;
+        return null;
     }
 }

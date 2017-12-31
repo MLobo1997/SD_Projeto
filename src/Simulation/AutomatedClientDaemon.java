@@ -84,7 +84,17 @@ public class AutomatedClientDaemon implements Runnable{
                     }
                     break;
                 }
-                else if (line.equals("&GAMEOVER&")) {
+                else if (line.equals("&GAMEOVER 0&")) {
+                    try {
+                        os.println(line);
+                        client.matchEnded();
+                        client.addLineToLog("O jogo terminou abruptamente(pelo menos um cliente perdeu ligacao).");
+                        break;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if (line.equals("&GAMEOVER 1&")) {
                     try {
                         xpHandler(); //Recebe e processa informações de xp do jogo
 
