@@ -16,7 +16,7 @@ public class lobbyBarrier {
     private List<TreeSet<ServerThread>> playersWaiting;
     ///** Estrutura que permite saber quantos jogadores se encontram em cada entrada de playersWaiting.*/
     //private int[] playersEntering;
-    ///** Época atual do jogo */ //TODO explicar melhor isto que o lobo não percebe
+    ///** Época atual do jogo */
     //private int[] gameEpoch;
     /** Número de ranks */
     private static final int rankNum = 10;
@@ -82,7 +82,6 @@ public class lobbyBarrier {
      */
     public void waitGame(ServerThread st) {
         System.out.println("Entrou para a lista de espera o jogador " + st.getPlayer().getUsername());
-        // TODO: Implementar distribuição normal pelas salas disponíveis talvez para reduzir espera?
         Player player = st.getPlayer();
         TreeSet<ServerThread> matchThreads;
 
@@ -118,7 +117,7 @@ public class lobbyBarrier {
             }
         }
         finally { //desbloqueia tudo
-            unlockLobbies(lobbyIndex); //TODO remover
+            unlockLobbies(lobbyIndex);
         }
 
     }

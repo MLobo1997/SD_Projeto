@@ -28,6 +28,8 @@ public class AutomatedClient implements Runnable {
     /** Instante em que foi iniciado o cliente*/
     private LocalDateTime startTime;
     /**Identifica se o cliente se encontra no processo de matching.*/
+    private boolean matchNotEnded;
+    /**Identifica se o cliente se encontra num match*/
     private boolean inMatch;
 
     /** Construtor do cliente.
@@ -47,6 +49,8 @@ public class AutomatedClient implements Runnable {
         }
         this.leave = false;
         this.log = new StringBuilder();
+        this.matchNotEnded = false;
+        this.inMatch = false;
     }
 
     /** Getter de username.
@@ -76,12 +80,25 @@ public class AutomatedClient implements Runnable {
      *
      * @throws Exception No caso de se tentar usar o método quando não se encontra em matching.
      */
-    void notInMatch() throws Exception{
-        if (inMatch) {
-            inMatch = false;
+    void matchEnded() throws Exception{
+        if (matchNotEnded) {
+            matchNotEnded = false;
         }
         else {
             throw new Exception("Foi invocado o método notInMatch quando o cliente não estava em match");
+        }
+    }
+
+    /** Identifica que o cliente se encontra atualmente num match.
+     *
+     * @throws Exception Se por algum motivo esta variável já se encontrar em true.
+     */
+    public void foundMatch() throws Exception{
+        if (!inMatch) {
+            inMatch = true;
+        }
+        else {
+            throw new Exception("Foi invocado o método gameEnded quando o cliente não estava em match");
         }
     }
 
@@ -203,11 +220,14 @@ public class AutomatedClient implements Runnable {
      */
     private void findMatch() {
         addLineToLog("---Iniciou a procura de um jogo---");
-        inMatch = true;
+        matchNotEnded = true;
+        inMatch = false;
 
-        while (inMatch) {
-            waitUntil(10);
-            out.println("Lorem ipsum dolor sit amet");
+        while (matchNotEnded) {
+            waitUntil(60);
+            if (inMatch) {
+                out.println("Lorem ipsum dolor sit amet");
+            }
         }
     }
 

@@ -23,8 +23,8 @@ public class PlayerAggregator implements Serializable, Cloneable {
      * @param p Original
      */
     private PlayerAggregator(PlayerAggregator p) {
-        this.players = new HashMap<>(p.players);
-        this.players.values().forEach(Player::clone);
+        this.players = new HashMap<>();
+        p.players.values().forEach(player -> this.players.put(player.getUsername(), player.clone().goOffline()));
     }
 
     public HashMap<String,Player> getPlayers() {

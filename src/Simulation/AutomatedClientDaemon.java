@@ -76,7 +76,12 @@ public class AutomatedClientDaemon implements Runnable{
             while (true){
                 line = is.readLine();
                 if (line == null) {
-                    client.addLineToLog("Ligação com o servidor perdida.");
+                    try {
+                        client.addLineToLog("Ligação com o servidor perdida.");
+                        client.matchEnded();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
                 else if (line.equals("&GAMEOVER&")) {
@@ -84,12 +89,19 @@ public class AutomatedClientDaemon implements Runnable{
                         xpHandler(); //Recebe e processa informações de xp do jogo
 
                         os.println(line);
-                        client.notInMatch();
+                        client.matchEnded();
                         client.addLineToLog("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
                         break;
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                         client.addLineToLog("Não foi recebido um integer como era suposto");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                else if (line.equals("&FOUNDGAME&")) {
+                    try {
+                        client.foundMatch();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

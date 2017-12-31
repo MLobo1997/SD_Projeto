@@ -126,7 +126,7 @@ public class Match implements Runnable {
      */
     public void waitForGameToStart() {
         matchLock.lock();
-        System.out.println("Waiting for " + threadsAwoken + " equal to " + matchInfo.getPlayerNum());
+        //System.out.println("Waiting for " + threadsAwoken + " equal to " + matchInfo.getPlayerNum());
         try {
             while (threadsAwoken != matchInfo.getPlayerNum()) {
                 try {
@@ -211,12 +211,6 @@ public class Match implements Runnable {
 
 
         waitForGameToStart();
-
-        if (!allPlayersOnline()) {
-            echoMessage("Pelo menos um dos jogadores nao se conseguir connectar.");
-           echoMessage("&GAMEOVER&");
-        }
-
 
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());

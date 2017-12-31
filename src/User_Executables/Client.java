@@ -18,6 +18,8 @@ public class Client {
     /** PrintWriter gerado do socket */
     private PrintWriter os         = null;
     /**Identifica se o cliente se encontra no processo de matching.*/
+    private boolean matchNotEnded;
+    /**Identifica se o cliente se encontra num match*/
     private boolean inMatch;
 
     /**
@@ -29,6 +31,7 @@ public class Client {
             socket  = new Socket("127.0.0.1",9999);
             is      = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             os      = new PrintWriter(socket.getOutputStream(),true);
+            matchNotEnded = false;
             inMatch = false;
         } catch (IOException e) {
             e.printStackTrace();
@@ -235,11 +238,14 @@ public class Client {
      * Ler informação do cliente necessária para inicializar jogo
      */
     private void findMatch() {
-        inMatch = true;
+        matchNotEnded = true;
+        inMatch = false;
         try {
             String lineInput = scanner.readLine();
-            while (inMatch || !(lineInput.equals("quit") || lineInput.equals("q"))) {
-                os.println(lineInput);
+            while (matchNotEnded || !(lineInput.equals("quit") || lineInput.equals("q"))) {
+                if (inMatch) {
+                    os.println(lineInput);
+                }
                 lineInput = scanner.readLine();
             }
         }
@@ -318,12 +324,25 @@ public class Client {
      *
      * @throws Exception No caso de se tentar usar o método quando não se encontra em matching.
      */
-    public void notInMatch() throws Exception{
-        if (inMatch) {
-            inMatch = false;
+    public void matchEnded() throws Exception{
+        if (matchNotEnded) {
+            matchNotEnded = false;
         }
         else {
-            throw new Exception("Foi invocado o método notInMatch quando o cliente não estava em match");
+            throw new Exception("Foi invocado o método gameEnded quando o cliente não estava em match");
+        }
+    }
+
+    /** Identifica que o cliente se encontra atualmente num match.
+     *
+     * @throws Exception Se por algum motivo esta variável já se encontrar em true.
+     */
+    public void foundMatch() throws Exception{
+        if (!inMatch) {
+            inMatch = true;
+        }
+        else {
+            throw new Exception("Foi invocado o método gameEnded quando o cliente não estava em match");
         }
     }
 
