@@ -364,13 +364,12 @@ public class ServerThread implements Comparable, Runnable, Observer {
             String str = in.readLine();
 
             while((str != null) && !str.equals("&GAMEOVER&")) {
-                if(str.matches("&CHOOSE [12]?[0-9]&")){
+                if(str.matches("/c[12]?[0-9]")){
                     int hero = Integer.parseInt(str.replaceAll("[\\D]", ""));
                     boolean res = currentMatch.chooseHero(this, hero);
                     if(res == true) {
                         String strclone = str;
-                        String heroNum = strclone.substring(0,str.length()-1).split(" ")[1];
-                        echoMessage(generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + heroNum);
+                        echoMessage(generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + hero);
                     }
                     else out.println("O Herói já foi selecionado! Tente outro!");
                 }

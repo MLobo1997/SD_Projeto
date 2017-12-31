@@ -4,6 +4,7 @@ import Service_Threads.ServerThread;
 import User_Executables.Server;
 import org.omg.PortableServer.ServantRetentionPolicyValue;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 /**
@@ -141,6 +142,18 @@ public class MatchInfo {
             res = picksTeamTwo.chooseHero(s.getPlayer().getUsername(),hero);
         }
 
+
         return res;
+    }
+
+    public static void noRepetitions (HeroSelection heroes) throws Exception{
+        ArrayList<Integer> l = new ArrayList<>();
+        for (Integer hero : heroes.getChoices().values()) {
+            if (!l.contains(hero)) {
+                l.add(hero);
+            }
+            else
+                throw new Exception("O heroi " + " foi repetido! " + heroes.getChoices());
+        }
     }
 }

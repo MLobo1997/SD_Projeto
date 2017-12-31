@@ -14,6 +14,14 @@ public class HeroSelection {
         choices = new HashMap<>();
     }
 
+    /** Getter de herois.
+     *
+     * @return Selecao de heróis.
+     */
+    public Map<String, Integer> getChoices() {
+        return choices;
+    }
+
     /**
      * Escolher um heroi se possível
      * @param playerName Nome do jogador que fará a escolha

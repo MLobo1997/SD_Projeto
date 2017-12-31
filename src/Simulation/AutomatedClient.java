@@ -222,11 +222,13 @@ public class AutomatedClient implements Runnable {
         addLineToLog("---Iniciou a procura de um jogo---");
         matchNotEnded = true;
         inMatch = false;
+        int hero;
 
         while (matchNotEnded) {
-            waitUntil(60);
+            hero = ThreadLocalRandom.current().nextInt(30);
+            waitUntil(15);
             if (inMatch) {
-                out.println("Lorem ipsum dolor sit amet");
+                out.println("/c" + hero);
             }
         }
     }
