@@ -2,8 +2,6 @@ package Game_Information;
 
 import Service_Threads.Match;
 import Service_Threads.ServerThread;
-import User_Executables.Server;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -23,7 +21,7 @@ public class lobbyBarrier {
     /** Número de ranks */
     private static final int rankNum = 10;
     /** Número de jogadores por jogo.*/
-    public static final int size = 10;
+    public static final int size = 2;
     ///** Coleção de threads dedicadas a jogadores.*/
     //private HashSet<ServerThread> players;
     /** Lock associado à condição do lobby i */
@@ -137,7 +135,6 @@ public class lobbyBarrier {
         new Thread(match).start();
 
         endMatching(matchThreads);
-        //gameEpoch[lobbyIndex]++;
         //conditionLobbiesAvailable[lobbyIndex].signalAll();
         //playersEntering[lobbyIndex] = 0;
         //playersWaiting.get(lobbyIndex).clear();

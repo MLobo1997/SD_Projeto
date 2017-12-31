@@ -74,3 +74,19 @@
 | name:e,rank:0,hero:n/a | 
 | name:d,rank:0,hero:n/a | name:f,rank:0,hero:n/a | 
 ----
+14:24:12
+| name:a,rank:0,hero:n/a | 
+| name:b,rank:0,hero:n/a | 
+----
+14:27:58
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | 
+----
+14:35:06
+| name:d,rank:0,hero:n/a | 
+| name:c,rank:0,hero:n/a | 
+----
+14:44:52
+| name:d,rank:0,hero:n/a | 
+| name:c,rank:0,hero:n/a | 
+----

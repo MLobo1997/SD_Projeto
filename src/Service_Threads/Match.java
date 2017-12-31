@@ -212,6 +212,12 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
+        if (!allPlayersOnline()) {
+            echoMessage("Pelo menos um dos jogadores nao se conseguir connectar.");
+           echoMessage("&GAMEOVER&");
+        }
+
+
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
@@ -228,5 +234,16 @@ public class Match implements Runnable {
 
         saveGameInfo();
 
+    }
+
+    private boolean allPlayersOnline() {
+
+        for (ServerThread st : matchInfo.getPlayers()) {
+            if (!st.getPlayer().isOnline()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
