@@ -84,7 +84,8 @@ public class AutomatedClientDaemon implements Runnable{
                     }
                     break;
                 }
-                else if (line.equals("&GAMEOVER&")) {
+                // TODO: LIdar com GAMEOVER 0
+                else if (line.equals("&GAMEOVER 1&")) {
                     try {
                         xpHandler(); //Recebe e processa informações de xp do jogo
 

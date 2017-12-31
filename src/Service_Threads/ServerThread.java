@@ -363,7 +363,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
             // Mensagem de input
             String str = in.readLine();
 
-            while((str != null) && !str.equals("&GAMEOVER&")) {
+            while((str != null) && !str.equals("&GAMEOVER 1&") && !str.equals("&GAMEOVER 0&")) {
                 if(str.matches("&CHOOSE [12]?[0-9]&")){
                     int hero = Integer.parseInt(str.replaceAll("[\\D]", ""));
                     boolean res = currentMatch.chooseHero(this, hero);
