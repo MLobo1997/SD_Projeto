@@ -1,0 +1,92 @@
+21:27:35
+| patricia | 
+| edgar | diogo | 
+----
+21:34:18
+| b | 
+| a | c | 
+----
+21:35:10
+| b | 
+| carlos | c | 
+----
+14:23:17
+| edgar | 
+| name:a,rank:0,hero:6|name:carlos,rank:0,hero:6|
+----
+14:29:24
+| name:carlos,rank:0,hero:n/a|
+| name:edgar,rank:0,hero:5|name:patricia,rank:0,hero:5|
+----
+14:42:26
+| name:b,rank:0,hero:9|
+| name:123,rank:0,hero:9|name:c,rank:0,hero:9|
+----
+14:44:28
+| name:b,rank:0,hero:n/a|
+| name:c,rank:0,hero:n/a|name:123,rank:0,hero:n/a|
+----
+14:49:34
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:9 | name:c,rank:0,hero:9 | 
+----
+14:51:48
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:-1 | name:c,rank:0,hero:-1 | 
+----
+14:54:57
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | name:c,rank:0,hero:n/a | 
+----
+15:02:17
+| name:carlos,rank:0,hero:n/a | 
+| name:edgar,rank:0,hero:9 | name:diogo,rank:0,hero:9 | 
+----
+15:19:11
+| name:mesa,rank:0,hero:5 | 
+| name:sala,rank:0,hero:9 | name:cadeira,rank:0,hero:9 | 
+----
+15:45:16
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:6 | name:c,rank:0,hero:1 | 
+----
+15:46:38
+| name:carlos,rank:0,hero:9 | 
+| name:edgar,rank:0,hero:9 | name:diogo,rank:0,hero:3 | 
+----
+15:47:34
+| name:carlos,rank:0,hero:n/a | 
+| name:diogo,rank:0,hero:25 | name:edgar,rank:0,hero:n/a | 
+----
+16:15:25
+| name:carlos,rank:0,hero:n/a | 
+| name:edgar,rank:0,hero:n/a | name:patricia,rank:0,hero:n/a | 
+----
+16:26:48
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | name:d,rank:0,hero:n/a | 
+----
+16:27:57
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | name:c,rank:0,hero:n/a | 
+----
+16:28:01
+| name:e,rank:0,hero:n/a | 
+| name:d,rank:0,hero:n/a | name:f,rank:0,hero:n/a | 
+----
+14:24:12
+| name:a,rank:0,hero:n/a | 
+| name:b,rank:0,hero:n/a | 
+----
+14:27:58
+| name:b,rank:0,hero:n/a | 
+| name:a,rank:0,hero:n/a | 
+----
+14:35:06
+| name:d,rank:0,hero:n/a | 
+| name:c,rank:0,hero:n/a | 
+----
+14:44:52
+| name:d,rank:0,hero:n/a | 
+| name:c,rank:0,hero:n/a | 
+----

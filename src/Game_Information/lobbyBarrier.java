@@ -2,8 +2,6 @@ package Game_Information;
 
 import Service_Threads.Match;
 import Service_Threads.ServerThread;
-import User_Executables.Server;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
@@ -136,7 +134,6 @@ public class lobbyBarrier {
         new Thread(match).start();
 
         endMatching(matchThreads);
-        //gameEpoch[lobbyIndex]++;
         //conditionLobbiesAvailable[lobbyIndex].signalAll();
         //playersEntering[lobbyIndex] = 0;
         //playersWaiting.get(lobbyIndex).clear();

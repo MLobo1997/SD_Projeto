@@ -213,8 +213,6 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
-        echoMessage("&FOUNDGAME&"); //notifica os clientes que encontraram um jogo
-
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
@@ -251,5 +249,16 @@ public class Match implements Runnable {
         }
 
         return null;
+    }
+
+    private boolean allPlayersOnline() {
+
+        for (ServerThread st : matchInfo.getPlayers()) {
+            if (!st.getPlayer().isOnline()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
