@@ -239,13 +239,14 @@ public class Client {
      */
     private void findMatch() {
         matchNotEnded = true;
-        inMatch = false;
         try {
             String lineInput = scanner.readLine();
             while (matchNotEnded || !(lineInput.equals("quit") || lineInput.equals("q"))) {
                 if (inMatch) {
                     os.println(lineInput);
                 }
+                else
+                    System.out.println("Not in match");
                 lineInput = scanner.readLine();
             }
         }
@@ -276,6 +277,7 @@ public class Client {
                     return 0;
                 }
                 else if (cmd.equals("p")){
+                    inMatch = false;
                     os.println("1");
                     return 1;
                 }
@@ -342,7 +344,7 @@ public class Client {
             inMatch = true;
         }
         else {
-            throw new Exception("Foi invocado o método gameEnded quando o cliente não estava em match");
+            throw new Exception("Foi invocado o método foundMatch quando o cliente estava num match");
         }
     }
 

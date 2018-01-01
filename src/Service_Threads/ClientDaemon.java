@@ -101,6 +101,7 @@ public class ClientDaemon implements Runnable {
                 }
                 else if (line.equals("&FOUNDGAME&")) {
                     try {
+                        System.out.println("ENCONTROU UM JOGO");
                         client.foundMatch();
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -212,6 +212,7 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
+        echoMessage("&FOUNDGAME&");
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");

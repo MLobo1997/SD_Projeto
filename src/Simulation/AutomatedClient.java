@@ -226,7 +226,6 @@ public class AutomatedClient implements Runnable {
     private void findMatch() {
         addLineToLog("---Iniciou a procura de um jogo---");
         matchNotEnded = true;
-        inMatch = false;
         int hero;
 
         while (matchNotEnded) {
@@ -255,6 +254,7 @@ public class AutomatedClient implements Runnable {
                 daemon = new Thread(new AutomatedClientDaemon(socket, this));
                 daemon.start();
 
+                inMatch = false;
                 out.println("1");
                 findMatch();
 
