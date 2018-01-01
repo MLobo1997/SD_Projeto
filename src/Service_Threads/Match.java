@@ -213,6 +213,8 @@ public class Match implements Runnable {
 
         waitForGameToStart();
 
+        echoMessage("&FOUNDGAME&"); //notifica os clientes que encontraram um jogo
+
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
@@ -222,7 +224,7 @@ public class Match implements Runnable {
         for (int i = 0; i < 6; i++) {
             echoMessage(i * 5 + " segundos passaram.");
             if ( (offlinePlayer = allPlayersOnline()) != null) {
-                echoMessage("Jogador '" + offlinePlayer + "' desconectado. Terminando o jogo");
+                echoMessage("Jogador '" + offlinePlayer + "' desconectado. Terminando o jogo.");
                 echoMessage("&GAMEOVER 0&");
                 return;
             }
@@ -249,16 +251,5 @@ public class Match implements Runnable {
         }
 
         return null;
-    }
-
-    private boolean allPlayersOnline() {
-
-        for (ServerThread st : matchInfo.getPlayers()) {
-            if (!st.getPlayer().isOnline()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
