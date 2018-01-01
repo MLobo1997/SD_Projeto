@@ -368,6 +368,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
                     boolean res = currentMatch.chooseHero(this, hero);
                     if(res == true) {
                         String strclone = str;
+                        out.println("Conseguiste o herói!"); //necessário para os bots saberem que conseguiram o herói
                         echoMessage(generateTimeStamp() + " Jogador " + player.getUsername() + " escolheu heroi nr " + hero);
                     }
                     else out.println("O Herói já foi selecionado! Tente outro!");

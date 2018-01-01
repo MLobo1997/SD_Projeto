@@ -100,7 +100,7 @@ public class AutomatedClientDaemon implements Runnable{
 
                         os.println(line);
                         client.matchEnded();
-                        client.addLineToLog("O jogo terminou. Escrever \"quit\" para voltar ao menu.");
+                        client.addLineToLog("O jogo terminou.");
                         break;
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
@@ -117,6 +117,9 @@ public class AutomatedClientDaemon implements Runnable{
                     }
                 }
                 else {
+                    if (line.equals("Conseguiste o herói!")) {
+                        client.gotHero();
+                    }
                     client.addLineToLog(line);
                 }
             }
@@ -124,6 +127,9 @@ public class AutomatedClientDaemon implements Runnable{
         catch (IOException | NullPointerException e) {
             e.printStackTrace();
             client.addLineToLog("Ligação com o servidor perdida.");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
         client.addLineToLog("A daemon morreu.");
     }

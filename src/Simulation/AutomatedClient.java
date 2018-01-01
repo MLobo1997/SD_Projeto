@@ -33,6 +33,8 @@ public class AutomatedClient implements Runnable {
     private boolean inMatch;
     /**Thread do daemon*/
     private Thread daemon;
+    /**Identifica se já tem um héroi*/
+    private boolean hasHero;
 
     /** Construtor do cliente.
      *
@@ -53,6 +55,7 @@ public class AutomatedClient implements Runnable {
         this.log = new StringBuilder();
         this.matchNotEnded = false;
         this.inMatch = false;
+        this.hasHero = false;
     }
 
     /** Getter de username.
@@ -220,20 +223,59 @@ public class AutomatedClient implements Runnable {
         leave = true;
     }
 
+    /** Informa que o cliente já tem um herói
+     *
+     */
+    void gotHero () throws Exception{
+        if (!hasHero) {
+            hasHero = true;
+        }
+        else {
+            throw new Exception("Foi chamada a função gotHero, quando o cliente já tinha um herói");
+        }
+    }
+
+    /** Escolhe um herói, tentando sempre escolher o com menor número possivel.
+     *
+     */
+    private void chooseHero () {
+        int hero = 0 ;
+        while (hero < 30 && !hasHero) {
+            if (inMatch) {
+                out.println("/c" + hero);
+                hero++;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                daemon.interrupt();
+                addLineToLog("---Fui morto forçosamente---");
+                printLog();
+                System.exit(0);
+            }
+
+        }
+    }
+
     /**
      *
      */
     private void findMatch() {
         addLineToLog("---Iniciou a procura de um jogo---");
         matchNotEnded = true;
-        int hero;
+        hasHero = false;
 
         while (matchNotEnded) {
-            hero = ThreadLocalRandom.current().nextInt(30);
-            waitUntil(15); //SE SE TIRAR ESTE MÉTODO DAQUI TEM QUE SE COLOCAR O QUE ESTÁ NO CATCH NO SEU INTERIOR
-            if (inMatch) {
-                out.println("/c" + hero);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) { //Para o caso de ser morto à força
+                daemon.interrupt();
+                addLineToLog("---Fui morto forçosamente---");
+                printLog();
+                System.exit(0);
             }
+
+            chooseHero();
         }
     }
 
