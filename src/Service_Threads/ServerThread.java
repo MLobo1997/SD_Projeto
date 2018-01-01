@@ -259,7 +259,6 @@ public class ServerThread implements Comparable, Runnable, Observer {
             cleanup();
 
         } catch (NullPointerException | IOException e) {
-            e.printStackTrace();
             cleanup();
         }
     }

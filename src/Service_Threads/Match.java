@@ -219,9 +219,12 @@ public class Match implements Runnable {
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
 
+        String offlinePlayer = null;
+
         for (int i = 0; i < 6; i++) {
             echoMessage(i * 5 + " segundos passaram.");
-            if (!allPlayersOnline()) {
+            if ( (offlinePlayer = allPlayersOnline()) != null) {
+                echoMessage("Jogador '" + offlinePlayer + "' desconectado. Terminando o jogo");
                 echoMessage("&GAMEOVER 0&");
                 return;
             }
@@ -236,13 +239,17 @@ public class Match implements Runnable {
         saveGameInfo();
     }
 
-    private boolean allPlayersOnline() {
+    /**
+     * Verifica se todos os jogadores no jogo estao online
+     * @return nome do primeiro jogador offline que encontra, null se nao encontra nada
+     */
+    private String allPlayersOnline() {
         for (ServerThread st : matchInfo.getPlayers()) {
             if (!st.getPlayer().isOnline()) {
-                return false;
+                return st.getPlayer().getUsername();
             }
         }
 
-        return true;
+        return null;
     }
 }
