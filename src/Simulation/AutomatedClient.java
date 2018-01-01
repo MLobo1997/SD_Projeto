@@ -31,6 +31,8 @@ public class AutomatedClient implements Runnable {
     private boolean matchNotEnded;
     /**Identifica se o cliente se encontra num match*/
     private boolean inMatch;
+    /**Thread do daemon*/
+    private Thread daemon;
 
     /** Construtor do cliente.
      *
@@ -65,13 +67,16 @@ public class AutomatedClient implements Runnable {
      *
      * @param maxSeconds Limite, em segundos.
      */
-    public static void waitUntil (int maxSeconds) {
+    public void waitUntil (int maxSeconds) {
         int waitTime = (int) (ThreadLocalRandom.current().nextDouble(maxSeconds) * 1000);
 
         try {
             Thread.sleep(waitTime);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            daemon.interrupt();
+            addLineToLog("---Fui morto forçosamente---");
+            printLog();
+            System.exit(0);
         }
     }
 
@@ -226,7 +231,7 @@ public class AutomatedClient implements Runnable {
 
         while (matchNotEnded) {
             hero = ThreadLocalRandom.current().nextInt(30);
-            waitUntil(15);
+            waitUntil(15); //SE SE TIRAR ESTE MÉTODO DAQUI TEM QUE SE COLOCAR O QUE ESTÁ NO CATCH NO SEU INTERIOR
             if (inMatch) {
                 out.println("/c" + hero);
             }
@@ -238,7 +243,6 @@ public class AutomatedClient implements Runnable {
      */
     private void play () {
         addLineToLog("---O utilizador entrou no ciclo de jogos---");
-        Thread t;
 
         while (true) {
             if (leave) {
@@ -248,14 +252,14 @@ public class AutomatedClient implements Runnable {
             }
             else {
                 //Cria o daemon igual ao do cliente normal
-                t = new Thread(new AutomatedClientDaemon(socket, this));
-                t.start();
+                daemon = new Thread(new AutomatedClientDaemon(socket, this));
+                daemon.start();
 
                 out.println("1");
                 findMatch();
 
                 try {
-                    t.join(); //Espera que morra (supostamente não necessário, mas está aqui para termos a certeza que acontece
+                    daemon.join(); //Espera que morra (supostamente não necessário, mas está aqui para termos a certeza que acontece
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

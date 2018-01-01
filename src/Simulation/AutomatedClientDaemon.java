@@ -112,6 +112,7 @@ public class AutomatedClientDaemon implements Runnable{
             }
         }
         catch (IOException | NullPointerException e) {
+            e.printStackTrace();
             client.addLineToLog("Ligação com o servidor perdida.");
         }
         client.addLineToLog("A daemon morreu.");

@@ -3,7 +3,10 @@ package Simulation;
 import com.opencsv.CSVReader;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Classe do programa que gera clientes que atuam aleatóriamente para fins de teste do servidor.
@@ -21,6 +24,8 @@ public class ClientGenerator {
     private TreeMap <String, AutomatedClient> clients;
     /** Leitor de informações de usuário*/
     private CSVReader userReader;
+    /** Tempo de espera máximo entre o momento que se indica que quer matar os clientes matá-los forçosamente*/
+    private static final int WAIT_TIME = 50;
 
     /**
      * Construtor da classe Simulation.ClientGenerator.
@@ -187,7 +192,18 @@ public class ClientGenerator {
         System.out.println("A sair.");
     }
 
-    /** Mata e espera que morram todos os clientes.
+    /** Mata todos os clientes vivos forçosamente.
+     *
+     */
+    private void bruteKillAllClients () {
+        for (Thread t : threads.values()) {
+            if (t.isAlive()) {
+                t.interrupt();
+            }
+        }
+    }
+
+    /** Espera que todos os clientes se desliguem ou mata-os.
      *
      */
     private void killAllClients () {
@@ -195,9 +211,16 @@ public class ClientGenerator {
             c.signalToLeave();
         }
 
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime max = start.plus(Duration.ofSeconds(WAIT_TIME));
         for (Thread t : threads.values()) { //Espera por todas as threads que foram corridas ao longo da execução do programa.
             try {
-                t.join();
+                t.join(WAIT_TIME*1000);
+                if (LocalDateTime.now().isAfter(max)) {
+                    System.out.println("Force kill");
+                    bruteKillAllClients();
+                    break;
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

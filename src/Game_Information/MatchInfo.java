@@ -126,6 +126,22 @@ public class MatchInfo {
         return -1;
     }
 
+    /** Método de teste para ver se não heróis repetidos numa seleção de heróis.
+     *
+     * @param heroes Seleção de heróis a ser testada
+     * @throws Exception Se esta exceção for lançada é pq existem heróis repetidos.
+     */
+    public static void noRepetitions (HeroSelection heroes) throws Exception{
+        ArrayList<Integer> l = new ArrayList<>();
+        for (Integer hero : heroes.getChoices().values()) {
+            if (!l.contains(hero)) {
+                l.add(hero);
+            }
+            else
+                throw new Exception("O heroi " + " foi repetido! " + heroes.getChoices());
+        }
+    }
+
     /**
      * Escolha do herói
      * @param s jogador que escolheu o herói
@@ -146,14 +162,4 @@ public class MatchInfo {
         return res;
     }
 
-    public static void noRepetitions (HeroSelection heroes) throws Exception{
-        ArrayList<Integer> l = new ArrayList<>();
-        for (Integer hero : heroes.getChoices().values()) {
-            if (!l.contains(hero)) {
-                l.add(hero);
-            }
-            else
-                throw new Exception("O heroi " + " foi repetido! " + heroes.getChoices());
-        }
-    }
 }
