@@ -77,7 +77,7 @@ public class lobbyBarrier {
     }
 
     /**
-     * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar //TODO este método atualmente faz mt mais que isto
+     * Manter thread de jogador a dormir até as condições necessárias ocorrerem para esta poder começar a jogar, ou no caso de já ser o 10º jogador, criar um match e libertar todas as outras em espera.
      * @param st thread que presta serviços ao cliente
      */
     public void waitGame(ServerThread st) {

@@ -62,11 +62,11 @@ public class PlayerAggregator implements Serializable, Cloneable {
     }
 
     /**
-     * Guarda informação de todos os jogadores
+     * Guarda informação de todos os jogadores, com synchronized, para não permitir que haja sobreposição de dados.
      */
-    public void savePlayersInfo() {
+    public synchronized void savePlayersInfo() {
         PlayerAggregator cl = (PlayerAggregator) this.clone();
-        cl.allPlayersGoOffline(); //solução provisória para não nos termos de chatear para já //TODO TIRAR
+        cl.allPlayersGoOffline();
 
         try  {
             FileOutputStream saveFile = new FileOutputStream("players.sav");

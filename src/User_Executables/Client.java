@@ -96,7 +96,7 @@ public class Client {
             switch (tmp) {
                 case "y":
                     skip = true;
-                    os.println("-1"); //comunica ao servidor que é para saltar. TODO substituir para 1
+                    os.println("-1"); //comunica ao servidor que é para saltar.
 
                     break;
                 case "n":
@@ -144,7 +144,7 @@ public class Client {
                         tmp = scanner.readLine();
                         if (tmp.equals("y")) {
                             check = true;
-                            os.println("1"); //transmite o 'yes' TODO UTILIZAR CheckIfSkip
+                            os.println("1"); //transmite o 'yes'
                         } else if (tmp.equals("n")) {
                             os.println("0"); //transmite o 'no'
                         }

@@ -391,7 +391,7 @@ public class ServerThread implements Comparable, Runnable, Observer {
         // Deixar cliente fazer login / registo
         connectUser();
 
-        // Fornecer possibilidades de menu principal (jogar, ver estatisticas( TODO ))
+        // Fornecer possibilidades de menu principal (jogar, sair)
         commandMode();
 
         cleanup();

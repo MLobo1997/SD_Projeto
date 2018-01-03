@@ -110,7 +110,7 @@ public class AutomatedClient implements Runnable {
         }
     }
 
-    /** Tenta realizar o registo de um jogador automatizado. TODO:Adicionar capacidade de no caso de já estar registado saltar para o login
+    /** Tenta realizar o registo de um jogador automatizado.
      *
      */
     private void tryToRegister(){

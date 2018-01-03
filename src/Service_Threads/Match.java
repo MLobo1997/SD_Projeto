@@ -217,7 +217,7 @@ public class Match implements Runnable {
         echoMessage("Equipa 1: " + matchInfo.getPlayersTeamOne());
         echoMessage("Equipa 2: " + matchInfo.getPlayersTeamTwo());
         echoMessage("O jogo começou!");
-        echoMessage("Escolha um heroi! (/c[0-30])");
+        echoMessage("Escolha um heroi! (/c[0-29])");
 
         String offlinePlayer = null;
 
