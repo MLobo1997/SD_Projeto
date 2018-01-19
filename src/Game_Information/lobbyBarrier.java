@@ -198,11 +198,12 @@ public class lobbyBarrier {
             lockLobbies[lobbyIndex - 1].lock();
         }
 
+        lockLobbies[lobbyIndex].lock();
+
         if (lobbyIndex + 1 < rankNum) { //é necessário bloquear para o caso de termos de ir buscar jogadores do rank imediatamente superior
             lockLobbies[lobbyIndex + 1].lock();
         }
 
-        lockLobbies[lobbyIndex].lock();
     }
 
     /** Método que desbloqueia um o lock de uma threads e o das suas vizinhas imediatas.
